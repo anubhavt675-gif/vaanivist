@@ -1,0 +1,494 @@
+[
+  {
+    "id": "aa3feb58-7983-4879-9117-905d008b8cf7",
+    "draft_id": "3dfd623f-1a40-4f86-b5b8-73696874a177",
+    "patient_id": "test-user-123",
+    "patient_name": "Anubhav Thakur",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "source_text": "Mujhe do din se bukhar aur khansi hai",
+    "source_language": "hinglish",
+    "input_method": "voice",
+    "audio_duration": 0,
+    "audio_metadata": null,
+    "status": "completed",
+    "is_urgent": false,
+    "urgent_reason": null,
+    "severity": "mild",
+    "ai_summary": "Patient reports experiencing fever and cough for the past two days.",
+    "structured_content": {
+      "main_complaint": "Fever and cough",
+      "duration": "Two days",
+      "symptom_pattern": "Continuous",
+      "medicine_use": null,
+      "known_allergies": null,
+      "associated_symptoms": null,
+      "severity": "mild",
+      "is_urgent": false,
+      "urgent_reason": null,
+      "follow_up_questions": [
+        "Kya aapko bukhar ke sath thand lag rahi hai?",
+        "Kya khansi me khakhra ya bलगam (mucus) aa raha hai?",
+        "Kya aapko saans lene me koi pareshani ho rahi hai?"
+      ],
+      "clinical_summary": "Patient reports experiencing fever and cough for the past two days."
+    },
+    "evidence": [
+      {
+        "field": "Main Complaint",
+        "path": "main_complaint",
+        "value": "Fever and cough",
+        "exact_quote": "bukhar aur khansi",
+        "confidence": 96,
+        "iconType": "lungs",
+        "start_offset": 16,
+        "end_offset": 33,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Duration",
+        "path": "duration",
+        "value": "Two days",
+        "exact_quote": "do din se",
+        "confidence": 94,
+        "iconType": "clock",
+        "start_offset": 6,
+        "end_offset": 15,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Symptom Pattern",
+        "path": "symptom_pattern",
+        "value": "Present for 2 days",
+        "exact_quote": "do din se",
+        "confidence": 90,
+        "iconType": "chart",
+        "start_offset": 6,
+        "end_offset": 15,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Medicine Use",
+        "path": "medicine_use",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 88,
+        "iconType": "pill",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      },
+      {
+        "field": "Known Allergies",
+        "path": "known_allergies",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 0,
+        "iconType": "shield",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      }
+    ],
+    "content_hash": "e81d7069c7be108a647a403cd20713ceb9de4f8af65954e91bb240f518c6329d",
+    "follow_up_questions": [
+      "Kya aapko bukhar ke sath thand lag rahi hai?",
+      "Kya khansi me khakhra ya bलगam (mucus) aa raha hai?",
+      "Kya aapko saans lene me koi pareshani ho rahi hai?"
+    ],
+    "doctor_notes": "",
+    "clinical_assessment": "",
+    "doctor_questions": [],
+    "assigned_doctor": {
+      "id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare"
+    },
+    "prescription": {
+      "id": "VV-RX-539353",
+      "consultation_id": "aa3feb58-7983-4879-9117-905d008b8cf7",
+      "verification_hash": "3f51762af423238e",
+      "patient_id": "test-user-123",
+      "patient_name": "Anubhav Thakur",
+      "patient_age": 26,
+      "patient_gender": "Male",
+      "clinical_assessment": "Acute viral fever and upper respiratory tract irritation",
+      "medicines": [
+        {
+          "name": "Tab. Paracetamol",
+          "strength": "650 mg",
+          "frequency": "1-0-1",
+          "duration": "3 days",
+          "instructions": "After food"
+        }
+      ],
+      "instructions": "Stay well-hydrated, take adequate rest, avoid cold drinks and exposure to smoke/dust.",
+      "precautions": "Seek immediate medical care if difficulty in breathing or high fever persists beyond 3 days.",
+      "follow_up_date": "After 5 days",
+      "doctor": {
+        "name": "Dr. Priya Sharma",
+        "qualification": "MBBS, MD (Internal Medicine)",
+        "registration_no": "DMC/R/2026/8941",
+        "hospital": "Vaani Vision Digital Healthcare",
+        "digital_signature": "Verified & Digitally Approved by Dr. Priya Sharma",
+        "signed_at": "2026-10-30T18:55:39.353Z"
+      },
+      "issued_date": "31 Oct 2026",
+      "created_at": "2026-10-30T18:55:39.376Z"
+    },
+    "created_at": "2026-10-30T18:55:15.939Z",
+    "updated_at": "2026-10-30T18:55:39.377Z",
+    "accepted_at": "2026-10-30T18:55:28.611Z"
+  },
+  {
+    "id": "520d18f8-46bb-49b1-a0b9-4f245acae230",
+    "draft_id": "fe3f33c3-fe7c-4e76-9b4b-0295be59a238",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Rohan Kumar",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "source_text": "मेरे मेरे सर मेरे सर में मेरे सर में बहुत मेरेसर में बहुत मेरेसर में बहुत ज्यादा मेरे सरमें बहुत ज्यादा मेरे सर मेंबहुत ज्यादा मेरे सर में बहुतज्यादा मेरे सर में बहुतज्यादा दर्द मेरे सर में बहुत ज्यादादर्द हो मेरे सर में बहुत ज्यादादर्द हो रहा मेरे सर में बहुत ज्यादादर्द हो रहा है मेरे सर में बहुत ज्यादादर्द हो रहा है और मेरे सर में बहुत ज्यादा दर्दहो रहा है और मेरे मेरे सर में बहुत ज्यादा दर्द होरहा है और मेरे मेरे सर में बहुत ज्यादा दर्द हो रहाहै और मेरे मेरे सर में बहुत ज्यादा दर्द हो रहा हैऔर मेरे पर मेरे सर में बहुत ज्यादा दर्द हो रहा हैऔर मेरे पैर में मेरे सर में बहुत ज्यादा दर्द हो रहा है औरमेरे पैर में भी मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरेपैर में भी मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरेपैर में भी काफी मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे परमें भी काफी मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर मेंभी काफी दर्द मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर मेंभी काफी दर्द हो मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भीकाफी दर्द हो रहा मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भीकाफी दर्द हो रहा है मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भी काफीदर्द हो रहा है मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भी काफी दर्दहो रहा है मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भी काफी दर्द होरहा है मेरे सर में बहुत ज्यादा दर्द हो रहा है और मेरे पैर में भी काफी दर्द हो रहा है",
+    "source_language": "hinglish",
+    "input_method": "voice",
+    "audio_duration": 5,
+    "audio_metadata": null,
+    "status": "in_progress",
+    "is_urgent": false,
+    "urgent_reason": null,
+    "severity": "severe",
+    "ai_summary": "Patient reports severe headache accompanied by significant pain in the legs based on the repeated statements in Hinglish. No specific duration or medication use was mentioned. Due to the high severity reported, clinical evaluation is advised to rule out underlying causes.",
+    "structured_content": {
+      "main_complaint": "Severe headache and leg pain",
+      "duration": null,
+      "symptom_pattern": "Continuous and severe",
+      "medicine_use": null,
+      "known_allergies": null,
+      "associated_symptoms": "Leg pain (pair me bhi kafi dard ho raha hai)",
+      "severity": "severe",
+      "is_urgent": false,
+      "urgent_reason": null,
+      "follow_up_questions": [
+        "Aapko yeh sar dard aur pair mein dard kitne dinon se ho raha hai?",
+        "Kya sar dard ke sath aapko chakkar aana, ulti jaisa lagna, ya ankhon se dhundhla dikhna jaisi koi samasya hai?",
+        "Kya aapko bukhar ya jism mein kamzori bhi mehsoos ho rahi hai?"
+      ],
+      "clinical_summary": "Patient reports severe headache accompanied by significant pain in the legs based on the repeated statements in Hinglish. No specific duration or medication use was mentioned. Due to the high severity reported, clinical evaluation is advised to rule out underlying causes."
+    },
+    "evidence": [
+      {
+        "field": "Main Complaint",
+        "path": "main_complaint",
+        "value": "Severe headache and leg pain",
+        "exact_quote": "mere sir mein bahut zyada dard ho raha hai aur mere pair mein bhi kafi dard ho raha hai",
+        "confidence": 96,
+        "iconType": "lungs",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "fabricated"
+      },
+      {
+        "field": "Duration",
+        "path": "duration",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 94,
+        "iconType": "clock",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      },
+      {
+        "field": "Symptom Pattern",
+        "path": "symptom_pattern",
+        "value": "Continuous and severe",
+        "exact_quote": "bahut zyada dard ho raha hai",
+        "confidence": 90,
+        "iconType": "chart",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "fabricated"
+      },
+      {
+        "field": "Medicine Use",
+        "path": "medicine_use",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 88,
+        "iconType": "pill",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      },
+      {
+        "field": "Known Allergies",
+        "path": "known_allergies",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 0,
+        "iconType": "shield",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      }
+    ],
+    "content_hash": "e8003b07036cedc9509b775aa34938a3a5557fb31d4bb82fe4fe3a7c36e173df",
+    "follow_up_questions": [
+      "Aapko yeh sar dard aur pair mein dard kitne dinon se ho raha hai?",
+      "Kya sar dard ke sath aapko chakkar aana, ulti jaisa lagna, ya ankhon se dhundhla dikhna jaisi koi samasya hai?",
+      "Kya aapko bukhar ya jism mein kamzori bhi mehsoos ho rahi hai?"
+    ],
+    "doctor_notes": "",
+    "clinical_assessment": "",
+    "doctor_questions": [],
+    "assigned_doctor": {
+      "id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare"
+    },
+    "prescription": null,
+    "created_at": "2026-10-30T15:31:46.853Z",
+    "updated_at": "2026-10-30T16:08:08.218Z",
+    "accepted_at": "2026-10-30T16:08:08.218Z"
+  },
+  {
+    "id": "08e025c3-9147-468c-8c33-18913c797089",
+    "draft_id": "e729cb4f-ed62-4a99-b8ce-2bd2d07321de",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Rohan Kumar",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "source_text": "Mujhe 3 din se tez bukhar aur khansi hai",
+    "source_language": "hinglish",
+    "input_method": "voice",
+    "audio_duration": 0,
+    "audio_metadata": null,
+    "status": "completed",
+    "is_urgent": false,
+    "urgent_reason": null,
+    "severity": "moderate",
+    "ai_summary": "Patient reports high fever and cough lasting for the past 3 days.",
+    "structured_content": {
+      "main_complaint": "Tez bukhar aur khansi",
+      "duration": "3 din",
+      "symptom_pattern": "Continuous",
+      "medicine_use": null,
+      "known_allergies": null,
+      "associated_symptoms": null,
+      "severity": "moderate",
+      "is_urgent": false,
+      "urgent_reason": null,
+      "follow_up_questions": [
+        "Kya aapko saans lene mein koi takleef ya seene mein dard mehsoos ho raha hai?",
+        "Kya aapka bukhar naapne par 101°F se zyada hai?",
+        "Kya khansi ke sath balgham ya khoon bhi aa raha hai?"
+      ],
+      "clinical_summary": "Patient reports high fever and cough lasting for the past 3 days."
+    },
+    "evidence": [
+      {
+        "field": "Main Complaint",
+        "path": "main_complaint",
+        "value": "Tez bukhar aur khansi",
+        "exact_quote": "tez bukhar aur khansi hai",
+        "confidence": 96,
+        "iconType": "lungs",
+        "start_offset": 15,
+        "end_offset": 40,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Duration",
+        "path": "duration",
+        "value": "3 din",
+        "exact_quote": "3 din se",
+        "confidence": 94,
+        "iconType": "clock",
+        "start_offset": 6,
+        "end_offset": 14,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Symptom Pattern",
+        "path": "symptom_pattern",
+        "value": "Continuous",
+        "exact_quote": "3 din se tez bukhar aur khansi hai",
+        "confidence": 90,
+        "iconType": "chart",
+        "start_offset": 6,
+        "end_offset": 40,
+        "verification_status": "verified"
+      },
+      {
+        "field": "Medicine Use",
+        "path": "medicine_use",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 88,
+        "iconType": "pill",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      },
+      {
+        "field": "Known Allergies",
+        "path": "known_allergies",
+        "value": null,
+        "exact_quote": null,
+        "confidence": 0,
+        "iconType": "shield",
+        "start_offset": null,
+        "end_offset": null,
+        "verification_status": "missing"
+      }
+    ],
+    "content_hash": "7a0d3cc243476c1a08d54708d0b285e61df6ece42bb81e8fb70b93dd002d1bb2",
+    "follow_up_questions": [
+      "Kya aapko saans lene mein koi takleef ya seene mein dard mehsoos ho raha hai?",
+      "Kya aapka bukhar naapne par 101°F se zyada hai?",
+      "Kya khansi ke sath balgham ya khoon bhi aa raha hai?"
+    ],
+    "doctor_notes": "",
+    "clinical_assessment": "",
+    "doctor_questions": [],
+    "assigned_doctor": {
+      "id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare"
+    },
+    "prescription": {
+      "id": "VV-RX-558693",
+      "consultation_id": "08e025c3-9147-468c-8c33-18913c797089",
+      "verification_hash": "ac3e0437558008d9",
+      "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+      "patient_name": "Rohan Kumar",
+      "patient_age": 28,
+      "patient_gender": "Male",
+      "clinical_assessment": "Acute Viral Febrile Illness with Bronchial Irritation",
+      "medicines": [
+        {
+          "frequency": "1-0-1 (Morning & Night after meals)",
+          "duration": "3 days",
+          "name": "Tab. Paracetamol",
+          "strength": "650 mg",
+          "instructions": "Take with warm water if fever is over 100�F"
+        },
+        {
+          "frequency": "10 ml twice daily",
+          "duration": "5 days",
+          "name": "Syrup Ambroxol",
+          "strength": "100 ml",
+          "instructions": "Gargle with warm salt water"
+        }
+      ],
+      "instructions": "Plenty of fluids and light digestible meals.",
+      "precautions": "Avoid cold foods. Seek emergency care if shortness of breath occurs.",
+      "follow_up_date": "3 days later",
+      "doctor": {
+        "name": "Dr. Priya Sharma",
+        "qualification": "MBBS, MD (Internal Medicine)",
+        "registration_no": "DMC/R/2026/8941",
+        "hospital": "Vaani Vision Digital Healthcare",
+        "digital_signature": "Verified & Digitally Approved by Dr. Priya Sharma",
+        "signed_at": "2026-10-30T14:12:38.694Z"
+      },
+      "issued_date": "30 Oct 2026",
+      "created_at": "2026-10-30T14:12:38.716Z"
+    },
+    "created_at": "2026-10-30T14:12:25.544Z",
+    "updated_at": "2026-10-30T14:12:38.718Z"
+  },
+  {
+    "id": "cons-101",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Rohan Kumar",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "source_text": "Mujhe 3 din se tez khansi aur gale me dard hai, raat ko khansi badh jati hai.",
+    "source_language": "hinglish",
+    "input_method": "voice",
+    "audio_duration": 14,
+    "status": "completed",
+    "is_urgent": false,
+    "severity": "moderate",
+    "ai_summary": "Patient reports persistent cough and pharyngeal irritation for 3 days with nocturnal exacerbation.",
+    "structured_content": {
+      "main_complaint": "Khansi aur gale me dard (Cough & Throat Pain)",
+      "duration": "3 din (3 days)",
+      "symptom_pattern": "Raat ko zyada hoti hai (Worse at night)",
+      "medicine_use": "None reported",
+      "known_allergies": "No known drug allergies"
+    },
+    "follow_up_questions": [
+      "Kya khansi ke sath kaph (phlegm) aa raha hai?",
+      "Kya gale me khich-khich ya nigalne me dard hai?"
+    ],
+    "doctor_notes": "Acute upper respiratory tract irritation. Advised vocal rest and steam inhalation.",
+    "clinical_assessment": "Acute Pharyngitis with nocturnal cough",
+    "created_at": "2026-10-28T13:54:56.996Z",
+    "updated_at": "2026-10-28T13:54:56.998Z"
+  },
+  {
+    "id": "cons-102",
+    "patient_id": "4cd831e9-eafd-4d81-9674-04a3e0349588",
+    "patient_name": "Neha Verma",
+    "patient_age": 32,
+    "patient_gender": "Female",
+    "source_text": "Pet me dard aur ulti ka man hota hai, khana khane ke baad bohot bechaini hoti hai.",
+    "source_language": "hinglish",
+    "input_method": "text",
+    "audio_duration": 0,
+    "status": "in_progress",
+    "is_urgent": false,
+    "severity": "moderate",
+    "ai_summary": "Epigastric discomfort and postprandial nausea lasting 2 days.",
+    "structured_content": {
+      "main_complaint": "Pet dard & Nausea",
+      "duration": "2 din (2 days)",
+      "symptom_pattern": "Khana khane ke baad discomfort badhta hai",
+      "medicine_use": "Antacid taken verbally"
+    },
+    "follow_up_questions": [
+      "Kya jalan ya acid reflux mehsoos ho rahi hai?",
+      "Kya pichle 24 ghante me ulti hui hai?"
+    ],
+    "doctor_notes": "Suspected acute gastric irritation. Recommended light non-spicy diet.",
+    "clinical_assessment": "Acute Gastritis / Dyspepsia",
+    "created_at": "2026-10-29T13:54:56.998Z",
+    "updated_at": "2026-10-30T12:54:56.998Z"
+  },
+  {
+    "id": "cons-103",
+    "patient_id": "9fd6f506-c04b-4c62-9309-b7b177f9fcca",
+    "patient_name": "Amit Singh",
+    "patient_age": 36,
+    "patient_gender": "Male",
+    "source_text": "Seene me achanak tez dard aur saans phool rahi hai, paseena aa raha hai.",
+    "source_language": "hinglish",
+    "input_method": "voice",
+    "audio_duration": 18,
+    "status": "urgent",
+    "is_urgent": true,
+    "urgent_reason": "Acute chest pain and diaphoresis detected. Immediate in-person cardiac evaluation required.",
+    "severity": "severe",
+    "ai_summary": "URGENT: Patient reports acute retrosternal chest discomfort, dyspnea, and sweating.",
+    "structured_content": {
+      "main_complaint": "Acute Chest Pain & Breathlessness",
+      "duration": "1 hour",
+      "symptom_pattern": "Sudden onset with diaphoresis",
+      "medicine_use": "None"
+    },
+    "follow_up_questions": [
+      "Immediate hospital transfer advised. Does pain radiate to left arm or jaw?"
+    ],
+    "doctor_notes": "CRITICAL: Advised patient to call ambulance and proceed to emergency department immediately.",
+    "clinical_assessment": "Atypical Chest Pain - R/O Acute Coronary Syndrome",
+    "created_at": "2026-10-30T11:54:56.998Z",
+    "updated_at": "2026-10-30T11:54:56.998Z"
+  }
+]

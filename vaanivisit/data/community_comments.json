@@ -1,0 +1,26 @@
+[
+  {
+    "id": "comm-1793297039011",
+    "postId": "post-1793297037864",
+    "author": "Dr. Priya Sharma",
+    "text": "Great tip on hydration! Consistent sleep hygiene is proven to reduce episode frequency.",
+    "time": "Just now",
+    "createdAt": 1793297039011
+  },
+  {
+    "id": "c1",
+    "postId": "post-mental-health",
+    "author": "Suresh Verma",
+    "text": "Bahut hi helpful post hai. Mujhe bhi ye problem thi, ab theek hoon.",
+    "time": "2 hrs ago",
+    "createdAt": 1793289836768
+  },
+  {
+    "id": "c2",
+    "postId": "post-mental-health",
+    "author": "Anita Singh",
+    "text": "Thank you for sharing this. We need more awareness about mental health in India.",
+    "time": "4 hrs ago",
+    "createdAt": 1793282636768
+  }
+]

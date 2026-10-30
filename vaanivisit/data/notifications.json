@@ -1,0 +1,142 @@
+[
+  {
+    "id": "notif-1793386628004-g6yk",
+    "user_id": "test-user-123",
+    "title": "New message from Dr. Priya Sharma",
+    "message": "Great Anubhav, ensure you stay hydrated and rest.",
+    "type": "message",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T18:57:08.004Z"
+  },
+  {
+    "id": "notif-1793386602745-0i79",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New message from Anubhav Thakur",
+    "message": "Hello Dr. Priya, I have taken the first dose of Paracetamol.",
+    "type": "message",
+    "link": "/doctor",
+    "read": false,
+    "created_at": "2026-10-30T18:56:42.745Z"
+  },
+  {
+    "id": "notif-1793386540637-qe6f",
+    "user_id": "test-user-123",
+    "title": "Prescription Ready for Download",
+    "message": "Dr. Priya Sharma approved your consultation prescription (#VV-RX-539353). Available for PDF download.",
+    "type": "prescription",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T18:55:40.637Z"
+  },
+  {
+    "id": "notif-1793386528948-xynk",
+    "user_id": "test-user-123",
+    "title": "🎉 Doctor Accepted Your Request",
+    "message": "Dr. Priya Sharma has accepted your consultation and is now actively reviewing your case.",
+    "type": "consultation",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T18:55:28.948Z"
+  },
+  {
+    "id": "notif-1793386517842-9ujr",
+    "user_id": "test-user-123",
+    "title": "Consultation Submitted Successfully",
+    "message": "Your voice consultation has been transcribed and assigned to Dr. Priya Sharma for clinical review.",
+    "type": "success",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T18:55:17.842Z"
+  },
+  {
+    "id": "notif-1793386517840-bjcp",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New Patient Consultation",
+    "message": "Anubhav Thakur submitted symptoms: \"Fever and cough\"",
+    "type": "consultation",
+    "link": "/review?id=aa3feb58-7983-4879-9117-905d008b8cf7",
+    "read": false,
+    "created_at": "2026-10-30T18:55:17.840Z"
+  },
+  {
+    "id": "notif-1793376488615-9dqp",
+    "user_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "title": "🎉 Doctor Accepted Your Request",
+    "message": "Dr. Priya Sharma has accepted your consultation and is now actively reviewing your case.",
+    "type": "consultation",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T16:08:08.615Z"
+  },
+  {
+    "id": "notif-1793374309438-v82f",
+    "user_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "title": "Consultation Submitted Successfully",
+    "message": "Your voice consultation has been transcribed and assigned to Dr. Priya Sharma for clinical review.",
+    "type": "success",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T15:31:49.438Z"
+  },
+  {
+    "id": "notif-1793374309436-9lcv",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New Patient Consultation",
+    "message": "Rohan Kumar submitted symptoms: \"Severe headache and leg pain\"",
+    "type": "consultation",
+    "link": "/review?id=520d18f8-46bb-49b1-a0b9-4f245acae230",
+    "read": false,
+    "created_at": "2026-10-30T15:31:49.436Z"
+  },
+  {
+    "id": "notif-1793369559977-ejiy",
+    "user_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "title": "Prescription Ready for Download",
+    "message": "Dr. Priya Sharma approved your consultation prescription (#VV-RX-558693). Available for PDF download.",
+    "type": "prescription",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T14:12:39.977Z"
+  },
+  {
+    "id": "notif-1793369546895-jqz8",
+    "user_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "title": "Consultation Submitted Successfully",
+    "message": "Your voice consultation has been transcribed and assigned to Dr. Priya Sharma for clinical review.",
+    "type": "success",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-30T14:12:26.895Z"
+  },
+  {
+    "id": "notif-1793369546892-or3d",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New Patient Consultation",
+    "message": "Rohan Kumar submitted symptoms: \"Tez bukhar aur khansi\"",
+    "type": "consultation",
+    "link": "/review?id=08e025c3-9147-468c-8c33-18913c797089",
+    "read": false,
+    "created_at": "2026-10-30T14:12:26.892Z"
+  },
+  {
+    "id": "notif-1",
+    "user_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "title": "Prescription Available",
+    "message": "Dr. Priya Sharma has generated your consultation prescription (#VV-RX-2026-9041). Download PDF now.",
+    "type": "prescription",
+    "link": "/patient",
+    "read": false,
+    "created_at": "2026-10-29T13:54:57.004Z"
+  },
+  {
+    "id": "notif-2",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New Consultation Request",
+    "message": "Rohan Kumar submitted voice symptoms for review.",
+    "type": "consultation",
+    "link": "/doctor",
+    "read": false,
+    "created_at": "2026-10-30T11:54:57.004Z"
+  }
+]

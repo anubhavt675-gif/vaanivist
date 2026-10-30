@@ -1,0 +1,93 @@
+[
+  {
+    "title": "How I managed chronic migraine naturally",
+    "content": "Regular sleep schedule aur hydration helped me recover significantly.",
+    "category": "Health Tips",
+    "author": "Rohan Kumar",
+    "authorRole": "Community Member",
+    "timeAgo": "Just now",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
+    "tags": [
+      "Community",
+      "Health Tips"
+    ],
+    "id": "post-1793297037864",
+    "likes": 2,
+    "comments": 1,
+    "views": "1 view",
+    "createdAt": 1793297037864
+  },
+  {
+    "id": "post-mental-health",
+    "author": "Priya Sharma",
+    "authorRole": "Health Advocate",
+    "timeAgo": "2 days ago",
+    "category": "Mental Health",
+    "title": "Mental health matters – It's okay to ask for help",
+    "content": "Mujhe bhi kabhi kabhi anxiety hoti thi. Pehle samajh nahi aata tha ki kya karu. Fir maine apne doston aur family se baat ki.\n\nAgar aap bhi aisa feel kar rahe ho, toh please akela mat raho.\n\nHelp maangna kamzori nahi, himmat hai. 💙",
+    "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
+    "likes": 245,
+    "comments": 12,
+    "views": "2.4k views",
+    "tags": [
+      "MentalHealth",
+      "Wellness",
+      "Story"
+    ],
+    "createdAt": 1793124236768
+  },
+  {
+    "id": "post-chhoti-chhoti",
+    "author": "Priya Sharma",
+    "authorRole": "Health Advocate",
+    "timeAgo": "2h ago",
+    "category": "Stories",
+    "title": "Chhoti chhoti baatein bhi zaroori hoti hain",
+    "content": "Anxiety se ladna ek journey hai, main bhi yahan se guzri thi...",
+    "image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80",
+    "likes": 245,
+    "comments": 12,
+    "views": "2.4k views",
+    "tags": [
+      "MentalHealth",
+      "StudentLife"
+    ],
+    "createdAt": 1793289836768
+  },
+  {
+    "id": "post-healthy-khana",
+    "author": "Neha Verma",
+    "authorRole": "Nutrition Coach",
+    "timeAgo": "5h ago",
+    "category": "Nutrition",
+    "title": "Healthy khana, healthy mind",
+    "content": "Ghar ka khana hi best hai... quick aur easy recipes share kar rahi hoon.",
+    "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80",
+    "likes": 189,
+    "comments": 8,
+    "views": "1.8k views",
+    "tags": [
+      "Nutrition",
+      "HealthyLiving"
+    ],
+    "createdAt": 1793279036768
+  },
+  {
+    "id": "post-habits",
+    "author": "Dr. Priya Sharma",
+    "authorRole": "Medical Reviewer",
+    "timeAgo": "1 day ago",
+    "category": "Health Tips",
+    "title": "Healthy habits for a better life",
+    "content": "Roz subah 20 minute walk aur adequate hydration se bohot sare lifestyle issues theek ho sakte hain.",
+    "image": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
+    "likes": 312,
+    "comments": 19,
+    "views": "2.1k views",
+    "tags": [
+      "HealthTips",
+      "Fitness"
+    ],
+    "createdAt": 1793210636768
+  }
+]

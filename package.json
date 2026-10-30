@@ -1,0 +1,13 @@
+{
+  "name": "vani-visit-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix vaanivisit run server",
+    "dev": "npm --prefix vaanivisit run dev",
+    "build": "npm --prefix vaanivisit run build",
+    "start": "npm --prefix vaanivisit run start",
+    "typecheck": "npm --prefix vaanivisit run typecheck"
+  }
+}
+

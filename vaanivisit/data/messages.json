@@ -1,0 +1,57 @@
+[
+  {
+    "id": "msg-seed-1",
+    "consultation_id": "520d18f8-46bb-49b1-a0b9-4f245acae230",
+    "sender_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "sender_name": "Dr. Priya Sharma",
+    "sender_role": "doctor",
+    "receiver_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "text": "Namaste Rohan ji, maine aapki AI voice intake summary review kar li hai. Sar dard ke alawa kya ulti ya chakkar jaisa lag raha hai?",
+    "created_at": "2026-10-30T13:43:41.388Z",
+    "read": true
+  },
+  {
+    "id": "msg-seed-2",
+    "consultation_id": "520d18f8-46bb-49b1-a0b9-4f245acae230",
+    "sender_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "sender_name": "Rohan Kumar",
+    "sender_role": "patient",
+    "receiver_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "text": "Namaste Doctor Sahiba. Ulti nahi hai, par aankhon ke piche bohot bhari dard hai aur pairon me kamzori lag rahi hai.",
+    "created_at": "2026-10-30T14:13:41.389Z",
+    "read": true
+  },
+  {
+    "id": "msg-seed-3",
+    "consultation_id": "520d18f8-46bb-49b1-a0b9-4f245acae230",
+    "sender_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "sender_name": "Dr. Priya Sharma",
+    "sender_role": "doctor",
+    "receiver_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "text": "Theek hai. Aap paani khoob pijiye aur screen time kam kijiye. Maine prescription generate kar diya hai, aap use dashboard se download kar sakte hain.",
+    "created_at": "2026-10-30T15:13:41.389Z",
+    "read": true
+  },
+  {
+    "id": "msg-1793386602744-10g3",
+    "consultation_id": "aa3feb58-7983-4879-9117-905d008b8cf7",
+    "sender_id": "test-user-123",
+    "sender_name": "Anubhav Thakur",
+    "sender_role": "patient",
+    "receiver_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "text": "Hello Dr. Priya, I have taken the first dose of Paracetamol.",
+    "created_at": "2026-10-30T18:56:42.744Z",
+    "read": false
+  },
+  {
+    "id": "msg-1793386628003-11pz",
+    "consultation_id": "aa3feb58-7983-4879-9117-905d008b8cf7",
+    "sender_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "sender_name": "Dr. Priya Sharma",
+    "sender_role": "doctor",
+    "receiver_id": "test-user-123",
+    "text": "Great Anubhav, ensure you stay hydrated and rest.",
+    "created_at": "2026-10-30T18:57:08.003Z",
+    "read": false
+  }
+]

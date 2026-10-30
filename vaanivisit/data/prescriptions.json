@@ -1,0 +1,119 @@
+[
+  {
+    "id": "VV-RX-539353",
+    "consultation_id": "aa3feb58-7983-4879-9117-905d008b8cf7",
+    "verification_hash": "3f51762af423238e",
+    "patient_id": "test-user-123",
+    "patient_name": "Anubhav Thakur",
+    "patient_age": 26,
+    "patient_gender": "Male",
+    "clinical_assessment": "Acute viral fever and upper respiratory tract irritation",
+    "medicines": [
+      {
+        "name": "Tab. Paracetamol",
+        "strength": "650 mg",
+        "frequency": "1-0-1",
+        "duration": "3 days",
+        "instructions": "After food"
+      }
+    ],
+    "instructions": "Stay well-hydrated, take adequate rest, avoid cold drinks and exposure to smoke/dust.",
+    "precautions": "Seek immediate medical care if difficulty in breathing or high fever persists beyond 3 days.",
+    "follow_up_date": "After 5 days",
+    "doctor": {
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare",
+      "digital_signature": "Verified & Digitally Approved by Dr. Priya Sharma",
+      "signed_at": "2026-10-30T18:55:39.353Z"
+    },
+    "issued_date": "31 Oct 2026",
+    "created_at": "2026-10-30T18:55:39.376Z"
+  },
+  {
+    "id": "VV-RX-558693",
+    "consultation_id": "08e025c3-9147-468c-8c33-18913c797089",
+    "verification_hash": "ac3e0437558008d9",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Rohan Kumar",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "clinical_assessment": "Acute Viral Febrile Illness with Bronchial Irritation",
+    "medicines": [
+      {
+        "frequency": "1-0-1 (Morning & Night after meals)",
+        "duration": "3 days",
+        "name": "Tab. Paracetamol",
+        "strength": "650 mg",
+        "instructions": "Take with warm water if fever is over 100�F"
+      },
+      {
+        "frequency": "10 ml twice daily",
+        "duration": "5 days",
+        "name": "Syrup Ambroxol",
+        "strength": "100 ml",
+        "instructions": "Gargle with warm salt water"
+      }
+    ],
+    "instructions": "Plenty of fluids and light digestible meals.",
+    "precautions": "Avoid cold foods. Seek emergency care if shortness of breath occurs.",
+    "follow_up_date": "3 days later",
+    "doctor": {
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare",
+      "digital_signature": "Verified & Digitally Approved by Dr. Priya Sharma",
+      "signed_at": "2026-10-30T14:12:38.694Z"
+    },
+    "issued_date": "30 Oct 2026",
+    "created_at": "2026-10-30T14:12:38.716Z"
+  },
+  {
+    "id": "VV-RX-2026-9041",
+    "consultation_id": "cons-101",
+    "verification_hash": "9a8b7c6d5e4f3a2b",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Rohan Kumar",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "clinical_assessment": "Acute Pharyngitis & Nocturnal Cough",
+    "medicines": [
+      {
+        "name": "Tab. Paracetamol",
+        "strength": "650 mg",
+        "frequency": "1-0-1 (Morning & Night after meals)",
+        "duration": "3 days",
+        "instructions": "Take with warm water if temperature rises"
+      },
+      {
+        "name": "Levocetirizine",
+        "strength": "5 mg",
+        "frequency": "0-0-1 (Once at bedtime)",
+        "duration": "5 days",
+        "instructions": "May cause mild drowsiness; avoid driving"
+      },
+      {
+        "name": "Ambroxol & Guaiphenesin Syrup",
+        "strength": "100 ml",
+        "frequency": "10 ml twice daily",
+        "duration": "5 days",
+        "instructions": "Gargle with lukewarm salt water before sleeping"
+      }
+    ],
+    "instructions": "Drink plenty of warm fluids, steam inhalation twice daily for 5-7 minutes.",
+    "precautions": "Do not consume cold beverages. Seek immediate review if breathing becomes laboured.",
+    "follow_up_date": "5 days later or SOS if symptoms persist",
+    "doctor": {
+      "name": "Dr. Priya Sharma",
+      "qualification": "MBBS, MD (Internal Medicine)",
+      "registration_no": "DMC/R/2026/8941",
+      "hospital": "Vaani Vision Digital Healthcare",
+      "digital_signature": "Verified & Digitally Approved by Dr. Priya Sharma",
+      "signed_at": "2026-10-28T13:54:57.003Z"
+    },
+    "issued_date": "28 Oct 2026",
+    "created_at": "2026-10-28T13:54:57.003Z"
+  }
+]
