@@ -126,7 +126,7 @@ export default function DoctorLoginPage() {
 
     if (isPhoneNumber) {
       const cleanDigits = trimmedInput.replace(/[^0-9]/g, "");
-      emailToUse = `phone_${cleanDigits}@vaanivisit.demo`;
+      emailToUse = `phone_${cleanDigits}@vision.demo`;
     }
 
     try {
@@ -356,7 +356,7 @@ export default function DoctorLoginPage() {
       >
         <img
           src="/doctor-login-left-2x.png"
-          alt="Vaani Vision - Make a bigger impact with AI-powered care"
+          alt="Vision - Make a bigger impact with AI-powered care"
           style={{
             width: "100%",
             height: "100%",
@@ -456,12 +456,12 @@ export default function DoctorLoginPage() {
             </h3>
             <span
               style={{
-                fontSize: "10px",
+                fontSize: "10.5px",
                 color: "#64748B",
                 fontWeight: 500,
               }}
             >
-              AI Voice Health Platform
+              AI Health Platform
             </span>
           </div>
 
@@ -1122,7 +1122,7 @@ export default function DoctorLoginPage() {
                     required
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
-                    placeholder="dr.priya@vaanivisit.demo"
+                    placeholder="dr.priya@vision.demo"
                     style={{
                       width: "100%",
                       height: "40px",

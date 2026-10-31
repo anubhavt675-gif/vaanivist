@@ -129,7 +129,7 @@ export default function LoginPage() {
 
     if (isPhoneNumber) {
       const cleanDigits = trimmedInput.replace(/[^0-9]/g, "");
-      emailToUse = `phone_${cleanDigits}@vaanivisit.demo`;
+      emailToUse = `phone_${cleanDigits}@vision.demo`;
     }
 
     try {
@@ -370,7 +370,7 @@ export default function LoginPage() {
       >
         <img
           src="/login-left-2x.png"
-          alt="Vaani Vision - Get expert medical advice, powered by AI"
+          alt="Vision - Get expert medical advice, powered by AI"
           style={{
             width: "100%",
             height: "100%",
@@ -437,12 +437,14 @@ export default function LoginPage() {
             <span>Back to Home</span>
           </Link>
 
-          {/* 2. Centered Logo Emblem */}
+          {/* 2. Centered Logo Emblem & Brand */}
           <div
             style={{
               display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               justifyContent: "center",
-              margin: "2px 0 6px",
+              margin: "2px 0 10px",
             }}
           >
             <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
@@ -456,6 +458,26 @@ export default function LoginPage() {
               />
               <circle cx="25" cy="16" r="7" fill="#1687F5" />
             </svg>
+            <h3
+              style={{
+                fontSize: "19px",
+                fontWeight: 800,
+                color: "#071D35",
+                margin: "4px 0 1px",
+                letterSpacing: "-0.3px",
+              }}
+            >
+              Vision
+            </h3>
+            <span
+              style={{
+                fontSize: "10.5px",
+                color: "#64748B",
+                fontWeight: 500,
+              }}
+            >
+              AI Health Platform
+            </span>
           </div>
 
           {/* 3. Welcome Back & Subtitle */}

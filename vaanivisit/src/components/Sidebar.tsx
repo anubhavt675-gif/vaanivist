@@ -84,7 +84,7 @@ export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
               id: defaultProfile.id,
               displayName: name,
               role,
-              email: defaultProfile.role === "reviewer" ? "dr.priya@vaanivisit.demo" : "rohan.kumar@vaanivisit.demo",
+              email: defaultProfile.role === "reviewer" ? "dr.priya@vision.demo" : "rohan.kumar@vision.demo",
               avatarUrl: defaultProfile.avatar_url || null,
               initials,
             });

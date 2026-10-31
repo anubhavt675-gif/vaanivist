@@ -10,7 +10,7 @@ export default function DoctorRegisterPage() {
   const [regNumber, setRegNumber] = useState("");
   const [specialization, setSpecialization] = useState("General Physician");
   const [qualification, setQualification] = useState("MBBS, MD");
-  const [hospital, setHospital] = useState("Vaani Vision Digital Healthcare");
+  const [hospital, setHospital] = useState("Vision Digital Healthcare");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -103,7 +103,7 @@ export default function DoctorRegisterPage() {
             Doctor Registration
           </h1>
           <p style={{ fontSize: "12px", color: "#64748b", margin: 0 }}>
-            Join the verified medical specialist network on Vaani Vision
+            Join the verified medical specialist network on Vision
           </p>
         </div>
 

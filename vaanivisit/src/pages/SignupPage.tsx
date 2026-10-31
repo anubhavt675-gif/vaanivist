@@ -104,18 +104,24 @@ export default function SignupPage() {
         </Link>
 
         {/* Brand Header */}
-        <div style={{ textAlign: "center", marginBottom: "22px" }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+            <svg width="38" height="38" viewBox="0 0 40 40" fill="none">
               <ellipse cx="14" cy="23" rx="8" ry="10" transform="rotate(-25 14 23)" fill="#00B8C8" />
               <circle cx="25" cy="16" r="7" fill="#1687F5" />
             </svg>
+            <h3 style={{ fontSize: "19px", fontWeight: 800, color: "#071D35", margin: "4px 0 1px", letterSpacing: "-0.3px" }}>
+              Vision
+            </h3>
+            <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 500 }}>
+              AI Health Platform
+            </span>
           </div>
-          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#071D35", margin: "0 0 6px" }}>
+          <h2 style={{ fontSize: "23px", fontWeight: 800, color: "#071D35", margin: "0 0 4px" }}>
             Create Patient Account
           </h2>
-          <p style={{ fontSize: "13px", color: "#64748B", margin: 0 }}>
-            Start AI consultations and connect with verified doctors
+          <p style={{ fontSize: "12.5px", color: "#64748B", margin: 0 }}>
+            Start AI consultations and connect with verified doctors on Vision
           </p>
         </div>
 
