@@ -1820,7 +1820,7 @@ app.post("/api/consultations/:id/prescriptions", async (req, res) => {
       doctor_name = "Dr. Priya Sharma",
       doctor_qualification = "MBBS, MD (Internal Medicine)",
       registration_no = "DMC/R/2026/8941",
-      hospital_name = "Vaani Vision Digital Healthcare",
+      hospital_name = "Vision Digital Healthcare",
     } = req.body;
 
     const consultations = getConsultations();
@@ -2151,7 +2151,7 @@ app.get("/api/conversations", (req, res) => {
       doctor_id: "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
       doctor_name: "Dr. Priya Sharma",
       doctor_qualification: "MBBS, MD • Verified Medical Reviewer",
-      main_complaint: "Welcome to Vaani Vision Consultation",
+      main_complaint: "Welcome to Vision Consultation",
       status: "in_review",
       messages: [
         {
@@ -2173,7 +2173,7 @@ app.get("/api/conversations", (req, res) => {
       },
       updated_at: new Date().toISOString(),
       prescription: null,
-      source_text: "Welcome to Vaani Vision Consultation",
+      source_text: "Welcome to Vision Consultation",
     };
     convMap.set(defaultId, defaultConv);
   }

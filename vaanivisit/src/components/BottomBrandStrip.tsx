@@ -108,26 +108,19 @@ export default function BottomBrandStrip() {
               />
             </svg>
           </div>
-          <div style={{ display: "flex", alignItems: "baseline" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
             <span
               style={{
                 fontSize: "20px",
                 fontWeight: 800,
-                color: "#ffffff",
+                background: "linear-gradient(135deg, #ffffff 40%, #22d3ee 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
                 letterSpacing: "-0.5px",
+                fontFamily: "'Inter', sans-serif"
               }}
             >
-              Vaani
-            </span>
-            <span
-              style={{
-                fontSize: "20px",
-                fontWeight: 800,
-                color: "#22d3ee",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              visit
+              Vision
             </span>
           </div>
         </div>

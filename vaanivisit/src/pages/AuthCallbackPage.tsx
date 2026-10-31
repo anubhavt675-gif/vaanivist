@@ -140,7 +140,7 @@ export default function AuthCallbackPage() {
         </div>
 
         <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#071D35", margin: "0 0 8px" }}>
-          Vaani Vision Authentication
+          Vision Authentication
         </h2>
 
         {error ? (

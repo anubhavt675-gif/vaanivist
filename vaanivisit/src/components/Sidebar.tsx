@@ -225,35 +225,37 @@ export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
 
             {/* Brand Typography */}
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ display: "flex", alignItems: "baseline" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
                 <span style={{
-                  color: "#ffffff",
-                  fontSize: "22px",
-                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #ffffff 40%, #22d3ee 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  fontSize: "23px",
+                  fontWeight: 800,
                   letterSpacing: "-0.5px",
-                  lineHeight: 1.1
-                }}>
-                  Vaani
-                </span>
-                <span style={{
-                  color: "#22d3ee",
-                  fontSize: "22px",
-                  fontWeight: 700,
-                  letterSpacing: "-0.5px",
-                  lineHeight: 1.1,
-                  marginLeft: "4px"
+                  lineHeight: 1.15,
+                  fontFamily: "'Inter', sans-serif"
                 }}>
                   Vision
                 </span>
+                <span style={{
+                  display: "inline-block",
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#22d3ee",
+                  marginLeft: "2px",
+                  boxShadow: "0 0 8px #22d3ee"
+                }} />
               </div>
               <span style={{
                 color: "#94a3b8",
                 fontSize: "11px",
-                fontWeight: 400,
-                letterSpacing: "0.02em",
-                marginTop: "3px"
+                fontWeight: 500,
+                letterSpacing: "0.03em",
+                marginTop: "2px"
               }}>
-                AI Voice Health Platform
+                AI Health Platform
               </span>
             </div>
           </div>

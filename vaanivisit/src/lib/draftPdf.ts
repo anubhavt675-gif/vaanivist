@@ -47,13 +47,13 @@ export function generateDraftPDF(data: DraftExportData): jsPDF {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
   doc.setTextColor(255, 255, 255);
-  doc.text("VAANI VISION", 16, 16);
+  doc.text("VISION", 16, 16);
 
   // Subtitle
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // #94a3b8
-  doc.text("AI Voice Health Platform - Verified Clinical Intake & Pre-Consultation Draft", 16, 23);
+  doc.text("AI Health Platform - Verified Clinical Intake & Pre-Consultation Draft", 16, 23);
 
   // Status Badge in Header
   doc.setFillColor(data.status === "Approved" ? 16 : 37, data.status === "Approved" ? 185 : 99, data.status === "Approved" ? 129 : 235);
@@ -247,7 +247,7 @@ export function generateDraftPDF(data: DraftExportData): jsPDF {
 export function downloadDraftPDF(data: DraftExportData) {
   const doc = generateDraftPDF(data);
   const cleanName = (data.patientName || "patient").toLowerCase().replace(/[^a-z0-9]/g, "_");
-  const filename = `vaanivision_clinical_draft_${cleanName}_${Date.now()}.pdf`;
+  const filename = `vision_clinical_draft_${cleanName}_${Date.now()}.pdf`;
   doc.save(filename);
 }
 

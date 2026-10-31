@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "vision",
   "buildCommand": "npm --prefix vaanivisit run build",
   "outputDirectory": "vaanivisit/dist",
   "rewrites": [

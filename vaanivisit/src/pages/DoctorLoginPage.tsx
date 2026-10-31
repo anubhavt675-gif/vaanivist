@@ -452,7 +452,7 @@ export default function DoctorLoginPage() {
                 letterSpacing: "-0.3px",
               }}
             >
-              Vaani Vision
+              Vision
             </h3>
             <span
               style={{

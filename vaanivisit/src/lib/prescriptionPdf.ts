@@ -51,13 +51,13 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
-  doc.text("VAANI VISION", 16, 18);
+  doc.text("VISION", 16, 18);
 
   // Brand Tagline
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // #94a3b8
-  doc.text("AI-Powered Multilingual Healthcare & Voice Consultation Platform", 16, 25);
+  doc.text("AI-Powered Healthcare & Clinical Teleconsultation Platform", 16, 25);
   doc.text("Telemedicine & Digital Clinical Care | Teleconsultation Guidelines 2026", 16, 31);
 
   // Rx Identifier badge on top-right
@@ -274,7 +274,7 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
 
 export function downloadPrescriptionPDF(data: PrescriptionData) {
   const doc = generatePrescriptionPDF(data);
-  const filename = `VaaniVision_Prescription_${data.patient_name.replace(/\s+/g, "_")}_${data.id}.pdf`;
+  const filename = `Vision_Prescription_${data.patient_name.replace(/\s+/g, "_")}_${data.id}.pdf`;
   doc.save(filename);
 }
 
