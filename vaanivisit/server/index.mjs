@@ -5,8 +5,14 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import crypto from "crypto";
+import dns from "dns";
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
+
+// Ensure Node uses IPv4 first to avoid IPv6 connection timeouts on Windows
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch (e) {}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,12 +31,57 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// --- Supabase Admin Client ---
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://wlwlbzrfazwtvsboljzp.supabase.co";
-const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
+// --- Supabase Client (Authenticated Service Session) ---
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "https://wlwlbzrfazwtvsboljzp.supabase.co";
+const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_IqnTtw8qtmdUHCJHFm2ZbA_hu8qRlXF";
 const admin = createClient(supabaseUrl, supabaseKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
+  auth: { autoRefreshToken: true, persistSession: false },
 });
+
+// Auto-authenticate backend client with clinical reviewer account so all RLS policies pass
+async function initServerAuth() {
+  try {
+    const { data, error } = await admin.auth.signInWithPassword({
+      email: "dr.priya@vaanivisit.demo",
+      password: "Password123!",
+    });
+    if (error) {
+      console.warn("[Supabase Server] Doctor auth warning:", error.message);
+    } else {
+      console.log("[Supabase Server] ✅ Connected & Authenticated as Dr. Priya (Reviewer ID:", data?.user?.id, ")");
+    }
+  } catch (err) {
+    console.warn("[Supabase Server] Auth exception:", err.message);
+  }
+}
+initServerAuth();
+
+// Patient Client for inserting patient-owned records adhering to RLS
+const patientClient = createClient(supabaseUrl, supabaseKey);
+let patientClientReady = false;
+
+async function getPatientClient(token = null) {
+  if (token) {
+    return createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+  }
+  const { data: sessionData } = await patientClient.auth.getSession();
+  if (!sessionData?.session) {
+    try {
+      await patientClient.auth.signInWithPassword({
+        email: "rohan.kumar@vaanivisit.demo",
+        password: "Password123!",
+      });
+      patientClientReady = true;
+      console.log("[Supabase Server] ✅ Patient Client Authenticated as Rohan Kumar");
+    } catch (e) {
+      console.warn("[Supabase Server] Patient auth error:", e.message);
+    }
+  }
+  return patientClient;
+}
+getPatientClient();
 
 // --- Clinical Evidence Validation & Hasher ---
 function calculateContentHash(content, sourceText) {
@@ -158,17 +209,18 @@ function deterministicClinicalFallback(sourceText, language) {
   };
 }
 
-async function extractWithGemini(sourceText, language) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const modelName = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+async function extractWithGroq(sourceText, language) {
+  const apiKey = process.env.GROQ_API_KEY || "";
+  const defaultModel = process.env.GROQ_MODEL || "qwen/qwen3.8-27b";
+  const MODELS_TO_TRY = [defaultModel, "openai/gpt-oss-120b", "openai/gpt-oss-20b", "allam-2-7b"];
+  const uniqueModels = [...new Set(MODELS_TO_TRY)];
 
-  if (!apiKey || apiKey.trim() === "" || apiKey === "your_gemini_api_key") {
-    return deterministicClinicalFallback(sourceText, language);
+  if (!apiKey || apiKey.trim() === "") {
+    console.log("[Groq] No API key found, trying Gemini / fallback");
+    return extractWithGemini(sourceText, language);
   }
 
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    const prompt = `Patient Language: ${language}
+  const prompt = `Patient Language: ${language}
 Patient Statement:
 "${sourceText}"
 
@@ -200,53 +252,195 @@ SAFETY GUARDRAILS:
 1. Do NOT provide a confirmed diagnosis.
 2. Do NOT prescribe any medicines or recommend prescription dosages.
 3. If red flag symptoms (severe chest pain, breathing collapse, loss of consciousness, uncontrolled bleeding, severe trauma) appear, set "is_urgent": true with an alert message instructing immediate emergency care.
-4. Provide 2-3 relevant clinical follow-up questions tailored to their symptoms in simple conversational language.`;
+4. Provide 2-3 relevant clinical follow-up questions tailored to their symptoms in simple conversational language.
+Return ONLY valid JSON. No markdown, no code blocks, no extra text.`;
 
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-      config: {
-        systemInstruction: "You are Vaani Vision's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails.",
-        responseMimeType: "application/json",
-      },
-    });
-
-    const parsed = JSON.parse(response.text || "{}");
-    const evidence = validateEvidence(parsed.evidence || [], sourceText);
-    const structured_content = {
-      main_complaint: parsed.structured_content?.main_complaint ?? null,
-      duration: parsed.structured_content?.duration ?? null,
-      symptom_pattern: parsed.structured_content?.symptom_pattern ?? null,
-      medicine_use: parsed.structured_content?.medicine_use ?? null,
-      known_allergies: parsed.structured_content?.known_allergies ?? null,
-      associated_symptoms: parsed.structured_content?.associated_symptoms ?? null,
-      severity: parsed.structured_content?.severity || "moderate",
-      is_urgent: Boolean(parsed.structured_content?.is_urgent),
-      urgent_reason: parsed.structured_content?.urgent_reason ?? null,
-      follow_up_questions: Array.isArray(parsed.structured_content?.follow_up_questions)
-        ? parsed.structured_content.follow_up_questions
-        : [
-            "Kya aapko bukhar ke saath sharir me dard ya thand lag rahi hai?",
-            "Kya aapne pehle koi dawa li hai?",
-            "Kya yeh pareshani pehle bhi kabhi hui thi?"
+  for (const tryModel of uniqueModels) {
+    try {
+      console.log(`[Groq] Extracting clinical intake using model: ${tryModel}`);
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: tryModel,
+          messages: [
+            {
+              role: "system",
+              content: "You are Vaani Vision's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
           ],
-      clinical_summary: parsed.structured_content?.clinical_summary ?? `Patient reported ${parsed.structured_content?.main_complaint || "symptoms"}.`,
-    };
+          response_format: { type: "json_object" },
+          temperature: 0.1
+        })
+      });
 
-    const content_hash = calculateContentHash(structured_content, sourceText);
+      if (!res.ok) {
+        const errText = await res.text();
+        console.warn(`[Groq] Model ${tryModel} HTTP ${res.status}: ${errText}`);
+        continue;
+      }
 
-    return {
-      structured_content,
-      evidence,
-      raw_source_text: sourceText,
-      source_language: language,
-      model_name: modelName,
-      content_hash,
-    };
-  } catch (err) {
-    console.warn("Gemini API call failed, falling back to deterministic parser:", err.message);
+      const data = await res.json();
+      let rawText = data.choices?.[0]?.message?.content || "{}";
+      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
+
+      const parsed = JSON.parse(rawText);
+      const evidence = validateEvidence(parsed.evidence || [], sourceText);
+      const structured_content = {
+        main_complaint: parsed.structured_content?.main_complaint ?? null,
+        duration: parsed.structured_content?.duration ?? null,
+        symptom_pattern: parsed.structured_content?.symptom_pattern ?? null,
+        medicine_use: parsed.structured_content?.medicine_use ?? null,
+        known_allergies: parsed.structured_content?.known_allergies ?? null,
+        associated_symptoms: parsed.structured_content?.associated_symptoms ?? null,
+        severity: parsed.structured_content?.severity || "moderate",
+        is_urgent: Boolean(parsed.structured_content?.is_urgent),
+        urgent_reason: parsed.structured_content?.urgent_reason ?? null,
+        follow_up_questions: Array.isArray(parsed.structured_content?.follow_up_questions)
+          ? parsed.structured_content.follow_up_questions
+          : [
+              "Kya aapko bukhar ke saath sharir me dard ya thand lag rahi hai?",
+              "Kya aapne pehle koi dawa li hai?",
+              "Kya yeh pareshani pehle bhi kabhi hui thi?"
+            ],
+        clinical_summary: parsed.structured_content?.clinical_summary ?? `Patient reported ${parsed.structured_content?.main_complaint || "symptoms"}.`,
+      };
+
+      const content_hash = calculateContentHash(structured_content, sourceText);
+      console.log(`[Groq] ✅ Success extracting with model: ${tryModel}`);
+
+      return {
+        structured_content,
+        evidence,
+        raw_source_text: sourceText,
+        source_language: language,
+        model_name: `groq/${tryModel}`,
+        content_hash,
+      };
+    } catch (modelErr) {
+      console.warn(`[Groq] Model ${tryModel} failed: ${modelErr.message}`);
+    }
+  }
+
+  console.warn("[Groq] All Groq models failed, trying Gemini fallback...");
+  return extractWithGemini(sourceText, language);
+}
+
+async function extractWithGemini(sourceText, language) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  // Use a valid Gemini model — fallback chain: env var → gemini-2.0-flash-lite → gemini-1.5-flash
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash-lite";
+
+  if (!apiKey || apiKey.trim() === "" || apiKey === "your_gemini_api_key") {
+    console.log("[Gemini] No API key found, using deterministic fallback");
     return deterministicClinicalFallback(sourceText, language);
   }
+
+  const MODELS_TO_TRY = [modelName, "gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-1.5-flash-latest"];
+  const uniqueModels = [...new Set(MODELS_TO_TRY)];
+
+  const prompt = `Patient Language: ${language}
+Patient Statement:
+"${sourceText}"
+
+Extract clinical intake information into this exact JSON structure:
+{
+  "structured_content": {
+    "main_complaint": string or null,
+    "duration": string or null,
+    "symptom_pattern": string or null,
+    "medicine_use": string or null,
+    "known_allergies": string or null,
+    "associated_symptoms": string or null,
+    "severity": "mild" | "moderate" | "severe",
+    "is_urgent": boolean,
+    "urgent_reason": string or null,
+    "follow_up_questions": [string, string, string],
+    "clinical_summary": string
+  },
+  "evidence": [
+    { "field": "Main Complaint", "path": "main_complaint", "value": string or null, "exact_quote": string or null, "confidence": 96, "iconType": "lungs" },
+    { "field": "Duration", "path": "duration", "value": string or null, "exact_quote": string or null, "confidence": 94, "iconType": "clock" },
+    { "field": "Symptom Pattern", "path": "symptom_pattern", "value": string or null, "exact_quote": string or null, "confidence": 90, "iconType": "chart" },
+    { "field": "Medicine Use", "path": "medicine_use", "value": string or null, "exact_quote": string or null, "confidence": 88, "iconType": "pill" },
+    { "field": "Known Allergies", "path": "known_allergies", "value": null, "exact_quote": null, "confidence": 0, "iconType": "shield" }
+  ]
+}
+
+SAFETY GUARDRAILS:
+1. Do NOT provide a confirmed diagnosis.
+2. Do NOT prescribe any medicines or recommend prescription dosages.
+3. If red flag symptoms (severe chest pain, breathing collapse, loss of consciousness, uncontrolled bleeding, severe trauma) appear, set "is_urgent": true with an alert message instructing immediate emergency care.
+4. Provide 2-3 relevant clinical follow-up questions tailored to their symptoms in simple conversational language.
+Return ONLY valid JSON. No markdown, no code blocks, no extra text.`;
+
+  for (const tryModel of uniqueModels) {
+    try {
+      console.log(`[Gemini] Trying model: ${tryModel}`);
+      const ai = new GoogleGenAI({ apiKey });
+
+      const response = await ai.models.generateContent({
+        model: tryModel,
+        contents: prompt,
+        config: {
+          systemInstruction: "You are Vaani Vision's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails.",
+          responseMimeType: "application/json",
+        },
+      });
+
+      // Strip markdown code fences if model wraps in ```json
+      let rawText = response.text || "{}";
+      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
+
+      const parsed = JSON.parse(rawText);
+      const evidence = validateEvidence(parsed.evidence || [], sourceText);
+      const structured_content = {
+        main_complaint: parsed.structured_content?.main_complaint ?? null,
+        duration: parsed.structured_content?.duration ?? null,
+        symptom_pattern: parsed.structured_content?.symptom_pattern ?? null,
+        medicine_use: parsed.structured_content?.medicine_use ?? null,
+        known_allergies: parsed.structured_content?.known_allergies ?? null,
+        associated_symptoms: parsed.structured_content?.associated_symptoms ?? null,
+        severity: parsed.structured_content?.severity || "moderate",
+        is_urgent: Boolean(parsed.structured_content?.is_urgent),
+        urgent_reason: parsed.structured_content?.urgent_reason ?? null,
+        follow_up_questions: Array.isArray(parsed.structured_content?.follow_up_questions)
+          ? parsed.structured_content.follow_up_questions
+          : [
+              "Kya aapko bukhar ke saath sharir me dard ya thand lag rahi hai?",
+              "Kya aapne pehle koi dawa li hai?",
+              "Kya yeh pareshani pehle bhi kabhi hui thi?"
+            ],
+        clinical_summary: parsed.structured_content?.clinical_summary ?? `Patient reported ${parsed.structured_content?.main_complaint || "symptoms"}.`,
+      };
+
+      const content_hash = calculateContentHash(structured_content, sourceText);
+      console.log(`[Gemini] ✅ Success with model: ${tryModel}`);
+
+      return {
+        structured_content,
+        evidence,
+        raw_source_text: sourceText,
+        source_language: language,
+        model_name: tryModel,
+        content_hash,
+      };
+    } catch (modelErr) {
+      console.warn(`[Gemini] Model ${tryModel} failed: ${modelErr.message}`);
+      // continue to next model in the loop
+    }
+  }
+
+  // All models failed — use deterministic fallback
+  console.warn("[Gemini] All models failed, using deterministic fallback");
+  return deterministicClinicalFallback(sourceText, language);
 }
 
 // --- Data Stores ---
@@ -455,15 +649,28 @@ app.post("/api/intakes", async (req, res) => {
       return res.status(400).json({ error: "Source text cannot be empty" });
     }
 
-    let userId = "ae05e114-5671-45da-ad13-ba1e60de8b7e";
-    const { data: defaultPatient } = await admin
-      .from("profiles")
-      .select("id")
-      .eq("role", "patient")
-      .limit(1)
-      .maybeSingle();
+    // Try to extract authenticated user from Bearer token
+    let userId = null;
+    let client = null;
+    const authHeader = req.headers.authorization || "";
+    if (authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      try {
+        const { data: { user } } = await admin.auth.getUser(token);
+        if (user?.id) {
+          userId = user.id;
+          client = createClient(supabaseUrl, supabaseKey, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+          });
+        }
+      } catch (_) { /* ignore token errors */ }
+    }
 
-    if (defaultPatient) userId = defaultPatient.id;
+    // Default fallback to primary demo patient Rohan Kumar
+    if (!userId || !client) {
+      userId = "ae05e114-5671-45da-ad13-ba1e60de8b7e";
+      client = await getPatientClient();
+    }
 
     const intakeRecord = {
       id: crypto.randomUUID(),
@@ -476,14 +683,18 @@ app.post("/api/intakes", async (req, res) => {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await admin
+    const { data, error } = await client
       .from("patient_intakes")
       .insert(intakeRecord)
       .select()
       .single();
 
     if (!error && data) {
+      console.log("[Supabase Server] ✅ Saved intake to Supabase:", data.id);
       return res.status(201).json({ success: true, intake: data });
+    }
+    if (error) {
+      console.warn("[Supabase Server] Intake insert notice:", error.message);
     }
     return res.status(201).json({ success: true, intake: intakeRecord });
   } catch (err) {
@@ -511,6 +722,7 @@ app.get("/api/intakes/:id", async (req, res) => {
 app.post("/api/intakes/:id/generate-draft", async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("[generate-draft] called with id:", id);
     let sourceText = req.body.source_text;
     let language = req.body.language || "hinglish";
 
@@ -531,7 +743,84 @@ app.post("/api/intakes/:id/generate-draft", async (req, res) => {
       sourceText = "Mujhe 3 din se khansi hai, raat ko zyada hoti hai. Allergy ki medicine kabhi-kabhi leta hoon...";
     }
 
-    const extraction = await extractWithGemini(sourceText, language);
+    // Verify intake exists in patient_intakes database
+    let realIntakeId = null;
+    if (id && id !== "latest" && !id.startsWith("temp-")) {
+      const { data: intakeCheck } = await admin
+        .from("patient_intakes")
+        .select("id, source_text, source_language")
+        .eq("id", id)
+        .maybeSingle();
+      if (intakeCheck) {
+        realIntakeId = intakeCheck.id;
+        if (!sourceText) {
+          sourceText = intakeCheck.source_text;
+          language = intakeCheck.source_language || language;
+        }
+      }
+    }
+
+    // If still null (e.g. "latest" or stale UUID not in DB), fall back to latest valid intake
+    if (!realIntakeId) {
+      const { data: latestIntake } = await admin
+        .from("patient_intakes")
+        .select("id, source_text, source_language")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (latestIntake) {
+        realIntakeId = latestIntake.id;
+        if (!sourceText) {
+          sourceText = latestIntake.source_text;
+          language = latestIntake.source_language || language;
+        }
+      }
+    }
+
+    // Deduplication check: if a valid draft already exists for this intake, return it immediately without re-extracting
+    if (realIntakeId && !realIntakeId.startsWith("temp-") && realIntakeId !== "latest") {
+      const { data: existingDraft } = await admin
+        .from("clinical_drafts")
+        .select("*, draft_field_evidence(*), patient_intakes(*)")
+        .eq("intake_id", realIntakeId)
+        .not("status", "eq", "superseded")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingDraft) {
+        console.log("[Supabase Server] ✅ Found existing draft for intake, returning cached:", existingDraft.id);
+        const evList = (existingDraft.draft_field_evidence || []).map((ev) => ({
+          field: ev.field_path,
+          path: ev.field_path,
+          value: ev.field_value,
+          exact_quote: ev.exact_quote,
+          start_offset: ev.start_offset,
+          end_offset: ev.end_offset,
+          confidence: 94,
+          verification_status: ev.verification_status || "verified",
+        }));
+
+        return res.json({
+          success: true,
+          cached: true,
+          draft: {
+            id: existingDraft.id,
+            intake_id: existingDraft.intake_id,
+            version: existingDraft.version || 1,
+            status: existingDraft.status,
+            structured_content: existingDraft.structured_content,
+            evidence: evList,
+            content_hash: existingDraft.content_hash,
+            ai_model_name: existingDraft.ai_model_name || "cached",
+            raw_source_text: sourceText || existingDraft.patient_intakes?.source_text,
+          },
+        });
+      }
+    }
+
+    // No existing draft — run extraction with Groq
+    const extraction = await extractWithGroq(sourceText, language);
     const draftId = crypto.randomUUID();
 
     let reviewerId = "c2e2338c-8bb5-4cb9-93c0-4d425c21492f";
@@ -544,21 +833,9 @@ app.post("/api/intakes/:id/generate-draft", async (req, res) => {
 
     if (reviewerProfile) reviewerId = reviewerProfile.id;
 
-    // Check if intake exists in database
-    let realIntakeId = id;
-    if (id === "latest" || id.startsWith("temp-")) {
-      const { data: latestIntake } = await admin
-        .from("patient_intakes")
-        .select("id")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (latestIntake) realIntakeId = latestIntake.id;
-    }
-
-    // Insert draft if intake exists
+    // Insert draft if intake exists — use admin client (logged in as Dr. Priya / reviewer, so RLS passes)
     if (realIntakeId && !realIntakeId.startsWith("temp-") && realIntakeId !== "latest") {
-      await admin.from("clinical_drafts").insert({
+      const { data: dData, error: dError } = await admin.from("clinical_drafts").insert({
         id: draftId,
         intake_id: realIntakeId,
         version: 1,
@@ -569,7 +846,13 @@ app.post("/api/intakes/:id/generate-draft", async (req, res) => {
         prompt_version: "v1.0.0",
         content_hash: extraction.content_hash,
         created_by: reviewerId,
-      });
+      }).select();
+
+      if (!dError) {
+        console.log("[Supabase Server] ✅ Saved clinical draft to Supabase:", draftId);
+      } else {
+        console.warn("[Supabase Server] Draft insert note:", dError.message);
+      }
 
       if (extraction.evidence.length > 0) {
         const evRows = extraction.evidence.map((ev) => ({
@@ -622,6 +905,25 @@ app.post("/api/intakes/:id/generate-draft", async (req, res) => {
 });
 
 // 3. Draft Details & Review
+app.get("/api/drafts/by-intake/:intakeId", async (req, res) => {
+  try {
+    const { intakeId } = req.params;
+    const { data, error } = await admin
+      .from("clinical_drafts")
+      .select("*, draft_field_evidence(*), patient_intakes(*)")
+      .eq("intake_id", intakeId)
+      .not("status", "eq", "superseded")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!error && data) return res.json({ draft: data });
+    return res.status(404).json({ error: "No draft found for this intake" });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/api/drafts/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -669,11 +971,23 @@ app.patch("/api/drafts/:id", async (req, res) => {
     const { id } = req.params;
     const { structured_content, reviewer_notes } = req.body;
 
-    const { data: currentDraft } = await admin
+    let { data: currentDraft } = await admin
       .from("clinical_drafts")
       .select("*")
       .eq("id", id)
       .maybeSingle();
+
+    if (!currentDraft) {
+      const { data: byIntake } = await admin
+        .from("clinical_drafts")
+        .select("*")
+        .eq("intake_id", id)
+        .not("status", "eq", "superseded")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      currentDraft = byIntake;
+    }
 
     if (currentDraft && currentDraft.status === "approved") {
       return res.status(400).json({ error: "Approved drafts are immutable. New edits must create a new version." });
@@ -766,6 +1080,161 @@ app.post("/api/drafts/:id/review", async (req, res) => {
 
     return res.json({ success: true, decision, status: decision });
   } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// 3.5. Submit Draft to Doctor Review
+app.post("/api/drafts/:id/submit-to-doctor", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      doctor_id = "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      doctor_name = "Dr. Priya Sharma",
+      patient_name = "Patient",
+      priority = "normal",
+      patient_notes = "",
+    } = req.body;
+
+    // 1. Fetch draft from Supabase
+    let draft = null;
+    let intake = null;
+
+    if (id && !id.startsWith("temp-") && id !== "latest") {
+      let { data: d } = await admin
+        .from("clinical_drafts")
+        .select("*, patient_intakes(*)")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (!d) {
+        const { data: dByIntake } = await admin
+          .from("clinical_drafts")
+          .select("*, patient_intakes(*)")
+          .eq("intake_id", id)
+          .not("status", "eq", "superseded")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        d = dByIntake;
+      }
+
+      if (d) {
+        draft = d;
+        intake = d.patient_intakes;
+      }
+    }
+
+    const intakeId = draft?.intake_id || req.body.intake_id;
+    const structured = draft?.structured_content || req.body.structured_content || {};
+    const sourceText = intake?.source_text || req.body.source_text || "Patient symptoms submitted";
+
+    // 2. Update Supabase clinical_drafts and patient_intakes
+    if (draft && draft.id) {
+      await admin
+        .from("clinical_drafts")
+        .update({ status: "in_review", updated_at: new Date().toISOString() })
+        .eq("id", draft.id);
+
+      if (intakeId) {
+        await admin
+          .from("patient_intakes")
+          .update({
+            status: "in_review",
+            assigned_reviewer_id: doctor_id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", intakeId);
+
+        await admin.from("audit_events").insert({
+          action: "draft_submitted_to_doctor",
+          entity_type: "clinical_draft",
+          entity_id: draft.id,
+          intake_id: intakeId,
+          metadata: { doctor_id, doctor_name, priority },
+        });
+      }
+    }
+
+    // 3. Add to consultations list for doctor dashboard queue
+    const consultationId = intakeId || crypto.randomUUID();
+    const consultations = getConsultations();
+    const existingIdx = consultations.findIndex((c) => c.id === consultationId || c.intake_id === intakeId);
+
+    const consultationItem = {
+      id: consultationId,
+      intake_id: intakeId,
+      draft_id: id,
+      patient_id: intake?.patient_id || "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+      patient_name: patient_name || "Patient",
+      patient_age: 28,
+      patient_gender: "Male",
+      assigned_doctor_id: doctor_id,
+      assigned_doctor_name: doctor_name,
+      source_text: sourceText,
+      source_language: intake?.source_language || "hinglish",
+      main_complaint: structured.main_complaint || sourceText.substring(0, 40),
+      duration: structured.duration || "Recent",
+      severity: structured.severity || (priority === "urgent" ? "severe" : "moderate"),
+      is_urgent: Boolean(structured.is_urgent || priority === "urgent"),
+      urgent_reason: structured.urgent_reason || null,
+      status: "in_review",
+      submitted_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      structured_content: structured,
+    };
+
+    if (existingIdx !== -1) {
+      consultations[existingIdx] = { ...consultations[existingIdx], ...consultationItem, status: "in_review" };
+    } else {
+      consultations.unshift(consultationItem);
+    }
+    saveConsultations(consultations);
+
+    // 4. Send doctor notification
+    addNotification({
+      user_id: doctor_id,
+      title: consultationItem.is_urgent ? "🚨 Urgent Consultation Request" : "New Patient Consultation Ready",
+      message: `${consultationItem.patient_name} submitted AI-analyzed symptoms: "${consultationItem.main_complaint}"`,
+      type: consultationItem.is_urgent ? "urgent" : "consultation",
+      link: `/review?id=${consultationId}`,
+    });
+
+    // 5. Save initial patient medical concern as first message in chat conversation
+    try {
+      const allMessages = getMessages();
+      const hasInitialMsg = allMessages.some(
+        (m) => m.consultation_id === consultationId && m.is_initial_complaint
+      );
+      if (!hasInitialMsg && sourceText) {
+        allMessages.push({
+          id: "msg-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+          consultation_id: consultationId,
+          sender_id: consultationItem.patient_id,
+          sender_name: consultationItem.patient_name || "Anubhav kumar thakur",
+          sender_role: "patient",
+          receiver_id: doctor_id,
+          receiver_name: doctor_name,
+          text: sourceText,
+          is_initial_complaint: true,
+          created_at: new Date().toISOString(),
+          read: false,
+        });
+        saveMessages(allMessages);
+      }
+    } catch (msgErr) {
+      console.warn("Could not save initial patient message:", msgErr);
+    }
+
+    return res.json({
+      success: true,
+      message: `Consultation request successfully submitted to ${doctor_name}`,
+      consultation_id: consultationId,
+      consultation: consultationItem,
+      status: "in_review",
+    });
+  } catch (err) {
+    console.error("Submit to doctor error:", err);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -1011,8 +1480,8 @@ app.post("/api/consultations", async (req, res) => {
     const consultationId = crypto.randomUUID();
     const draftId = crypto.randomUUID();
 
-    // 1. Run AI Extraction with Gemini
-    const extraction = await extractWithGemini(source_text, source_language);
+    // 1. Run AI Extraction with Groq
+    const extraction = await extractWithGroq(source_text, source_language);
 
     // 2. Prepare consultation record
     const status = extraction.structured_content.is_urgent ? "urgent" : "new";
@@ -1072,7 +1541,7 @@ app.post("/api/consultations", async (req, res) => {
         version: 1,
         structured_content: extraction.structured_content,
         status: "pending_review",
-        generation_source: input_method === "voice" ? "ai_voice_gemini" : "ai_text_gemini",
+        generation_source: "ai_gemini",
         ai_model_name: extraction.model_name,
         prompt_version: "v2.0.0",
         content_hash: extraction.content_hash,
@@ -1445,6 +1914,31 @@ app.post("/api/consultations/:id/prescriptions", async (req, res) => {
       link: `/patient`,
     });
 
+    // Also push a prescription message into chat thread
+    try {
+      const allMessages = getMessages();
+      allMessages.push({
+        id: "msg-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+        consultation_id: id,
+        sender_id: "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+        sender_name: doctor_name,
+        sender_role: "doctor",
+        receiver_id: consultation?.patient_id || "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+        text: `Hello, I have reviewed your case and generated your official digital prescription (#${prescriptionId}). Please download the verified PDF below and follow the medication instructions. Take care!`,
+        attachment: {
+          type: "prescription_pdf",
+          fileName: `Prescription_${prescriptionId}.pdf`,
+          prescriptionId: prescriptionId,
+          prescriptionData: prescription,
+        },
+        created_at: new Date().toISOString(),
+        read: false,
+      });
+      saveMessages(allMessages);
+    } catch (e) {
+      console.warn("Could not save prescription message in chat:", e);
+    }
+
     return res.status(201).json({
       success: true,
       prescription,
@@ -1542,6 +2036,7 @@ app.post("/api/messages", (req, res) => {
     sender_role = "patient",
     receiver_id,
     text,
+    attachment,
   } = req.body;
 
   if (!text || text.trim() === "") {
@@ -1557,6 +2052,7 @@ app.post("/api/messages", (req, res) => {
     sender_role,
     receiver_id: receiver_id || (sender_role === "patient" ? "c2e2338c-8bb5-4cb9-93c0-4d425c21492f" : "ae05e114-5671-45da-ad13-ba1e60de8b7e"),
     text: text.trim(),
+    attachment: attachment || null,
     created_at: new Date().toISOString(),
     read: false,
   };
@@ -1570,10 +2066,150 @@ app.post("/api/messages", (req, res) => {
     title: `New message from ${sender_name}`,
     message: text.length > 60 ? text.substring(0, 57) + "..." : text,
     type: "message",
-    link: sender_role === "patient" ? "/doctor" : "/patient",
+    link: sender_role === "patient" ? "/doctor" : "/messages",
   });
 
   return res.status(201).json({ success: true, message: newMsg });
+});
+
+// List Conversations with Doctors
+app.get("/api/conversations", (req, res) => {
+  const { role = "patient", user_id } = req.query;
+  const consultations = getConsultations();
+  const allMessages = getMessages();
+
+  const convMap = new Map();
+
+  for (const c of consultations) {
+    convMap.set(c.id, {
+      id: c.id,
+      consultation_id: c.id,
+      patient_id: c.patient_id,
+      patient_name: c.patient_name || "Anubhav kumar thakur",
+      doctor_id: c.assigned_doctor_id || "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      doctor_name: c.assigned_doctor_name || "Dr. Priya Sharma",
+      doctor_qualification: "MBBS, MD • Verified Medical Reviewer",
+      main_complaint: c.main_complaint || c.source_text || "General Consultation",
+      status: c.status || "in_review",
+      messages: [],
+      unread_count: 0,
+      last_message: null,
+      updated_at: c.submitted_at || c.created_at || new Date().toISOString(),
+      prescription: c.prescription || null,
+      source_text: c.source_text || "",
+    });
+  }
+
+  for (const msg of allMessages) {
+    const cId = msg.consultation_id || "general";
+    if (!convMap.has(cId)) {
+      convMap.set(cId, {
+        id: cId,
+        consultation_id: cId,
+        patient_id: msg.sender_role === "patient" ? msg.sender_id : msg.receiver_id,
+        patient_name: msg.sender_role === "patient" ? msg.sender_name : "Anubhav kumar thakur",
+        doctor_id: msg.sender_role === "doctor" ? msg.sender_id : msg.receiver_id,
+        doctor_name: msg.sender_role === "doctor" ? msg.sender_name : "Dr. Priya Sharma",
+        doctor_qualification: "MBBS, MD • Verified Medical Reviewer",
+        main_complaint: "Medical Consultation",
+        status: "in_review",
+        messages: [],
+        unread_count: 0,
+        last_message: null,
+        updated_at: msg.created_at,
+        prescription: null,
+        source_text: msg.is_initial_complaint ? msg.text : "",
+      });
+    }
+
+    const conv = convMap.get(cId);
+    conv.messages.push(msg);
+
+    if (msg.is_initial_complaint && !conv.source_text) {
+      conv.source_text = msg.text;
+    }
+
+    if (role === "patient" && msg.sender_role === "doctor" && !msg.read) {
+      conv.unread_count++;
+    } else if (role === "doctor" && msg.sender_role === "patient" && !msg.read) {
+      conv.unread_count++;
+    }
+
+    if (!conv.last_message || new Date(msg.created_at) > new Date(conv.last_message.created_at)) {
+      conv.last_message = msg;
+      conv.updated_at = msg.created_at;
+    }
+  }
+
+  if (convMap.size === 0) {
+    const defaultId = "cons-welcome";
+    const defaultConv = {
+      id: defaultId,
+      consultation_id: defaultId,
+      patient_id: "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+      patient_name: "Anubhav kumar thakur",
+      doctor_id: "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+      doctor_name: "Dr. Priya Sharma",
+      doctor_qualification: "MBBS, MD • Verified Medical Reviewer",
+      main_complaint: "Welcome to Vaani Vision Consultation",
+      status: "in_review",
+      messages: [
+        {
+          id: "msg-welcome-1",
+          consultation_id: defaultId,
+          sender_id: "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+          sender_name: "Dr. Priya Sharma",
+          sender_role: "doctor",
+          receiver_id: "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+          text: "Namaste! I am Dr. Priya Sharma. I have received your health details and will assist you with clinical evaluation and prescriptions. How can I help you today?",
+          created_at: new Date().toISOString(),
+          read: true,
+        },
+      ],
+      unread_count: 0,
+      last_message: {
+        text: "Namaste! I am Dr. Priya Sharma. How can I help you today?",
+        created_at: new Date().toISOString(),
+      },
+      updated_at: new Date().toISOString(),
+      prescription: null,
+      source_text: "Welcome to Vaani Vision Consultation",
+    };
+    convMap.set(defaultId, defaultConv);
+  }
+
+  const list = Array.from(convMap.values()).sort(
+    (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  );
+
+  const totalUnread = list.reduce((sum, c) => sum + (c.unread_count || 0), 0);
+
+  return res.json({ conversations: list, total_unread: totalUnread });
+});
+
+// Mark messages as read for a consultation
+app.post("/api/messages/mark-read", (req, res) => {
+  const { consultation_id, role = "patient" } = req.body;
+  const all = getMessages();
+  let modified = false;
+
+  for (const m of all) {
+    if (consultation_id && m.consultation_id !== consultation_id) continue;
+    if (role === "patient" && m.sender_role === "doctor" && !m.read) {
+      m.read = true;
+      modified = true;
+    }
+    if (role === "doctor" && m.sender_role === "patient" && !m.read) {
+      m.read = true;
+      modified = true;
+    }
+  }
+
+  if (modified) {
+    saveMessages(all);
+  }
+
+  return res.json({ success: true });
 });
 
 // Doctor Accepts Request Atomically

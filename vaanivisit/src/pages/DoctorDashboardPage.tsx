@@ -1134,7 +1134,7 @@ export default function DoctorDashboardPage() {
 
                 <div>
                   <label style={{ fontSize: "11px", fontWeight: 700, color: "#0284c7", textTransform: "uppercase" }}>
-                    AI Clinical Synthesis (Gemini 3.5 Flash Lite):
+                    AI Clinical Synthesis (Groq LPU):
                   </label>
                   <p style={{ margin: "6px 0 0", padding: "12px", background: "#f0f9ff", borderRadius: "10px", border: "1px solid #bae6fd", fontSize: "12px", color: "#0369a1", lineHeight: 1.5 }}>
                     {selectedRequest.ai_summary || "Symptoms structured for clinical decision support."}
@@ -1169,100 +1169,46 @@ export default function DoctorDashboardPage() {
                   background: "#f8fafc",
                   borderTop: "1px solid #e2e8f0",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-end",
                   gap: "10px",
                 }}
               >
                 <button
-                  type="button"
-                  onClick={async () => {
-                    if (!doctorNote.trim()) return;
-                    try {
-                      await fetch(`/api/consultations/${selectedRequest.id}/notes`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ note: doctorNote.trim() }),
-                      });
-                      setLiveNotice("✓ Clinical notes saved.");
-                      setTimeout(() => setLiveNotice(null), 3000);
-                      fetchDoctorData();
-                    } catch (e) {}
+                  onClick={() => {
+                    handleOpenChat(selectedRequest);
+                    setIsViewModalOpen(false);
                   }}
                   style={{
-                    padding: "8px 14px",
+                    padding: "8px 16px",
                     borderRadius: "10px",
-                    border: "1px solid #cbd5e1",
+                    border: "1px solid #dce7f1",
                     background: "white",
-                    color: "#0f172a",
+                    color: "#2563eb",
                     fontSize: "12px",
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: "pointer",
                   }}
                 >
-                  💾 Save Notes
+                  💬 Open Chat
                 </button>
-
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <button
-                    onClick={() => {
-                      handleOpenChat(selectedRequest);
-                      setIsViewModalOpen(false);
-                    }}
-                    style={{
-                      padding: "8px 14px",
-                      borderRadius: "10px",
-                      border: "1px solid #dce7f1",
-                      background: "white",
-                      color: "#2563eb",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    💬 Chat
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setIsViewModalOpen(false);
-                      setIsRxModalOpen(true);
-                    }}
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "10px",
-                      border: "none",
-                      background: "linear-gradient(135deg, #0d9488, #059669)",
-                      color: "white",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    📄 Issue Rx
-                  </button>
-
-                  {selectedRequest.status !== "in_progress" && (
-                    <button
-                      onClick={() => {
-                        handleAcceptRequest(selectedRequest);
-                        setIsViewModalOpen(false);
-                      }}
-                      style={{
-                        padding: "8px 18px",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
-                        color: "white",
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Accept Case
-                    </button>
-                  )}
-                </div>
+                <button
+                  onClick={() => {
+                    handleAcceptRequest(selectedRequest);
+                    setIsViewModalOpen(false);
+                  }}
+                  style={{
+                    padding: "8px 20px",
+                    borderRadius: "10px",
+                    border: "none",
+                    background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+                    color: "white",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Accept Case
+                </button>
               </div>
             </div>
           </div>

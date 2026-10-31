@@ -4,6 +4,7 @@ import { broadcastRealtimeEvent } from "../lib/realtime";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import VoiceConsultationModal from "../components/VoiceConsultationModal";
 import ChatModal from "../components/ChatModal";
+import Sidebar from "../components/Sidebar";
 import { downloadPrescriptionPDF, PrescriptionData } from "../lib/prescriptionPdf";
 
 const quickExamplesList = [
@@ -227,15 +228,26 @@ export default function HomePage() {
 
   const handleGenerate = async () => {
     const textToSubmit = symptomText.trim() || quickExamplesList[0].text;
-    setFeedbackMsg("Submitting symptoms & extracting clinical facts with Gemini AI...");
+    setFeedbackMsg("Submitting symptoms & extracting clinical facts with Groq AI...");
     try {
       if (typeof window !== "undefined") {
         sessionStorage.setItem("vani_symptom_text", textToSubmit);
         sessionStorage.setItem("vani_symptom_lang", selectedLanguage);
       }
+
+      // Get auth token to pass to backend so it can identify the user
+      const supabase = getSupabaseBrowserClient();
+      const authHeaders: Record<string, string> = { "Content-Type": "application/json" };
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          authHeaders["Authorization"] = `Bearer ${session.access_token}`;
+        }
+      }
+
       const res = await fetch("/api/intakes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({
           source_text: textToSubmit,
           source_language: selectedLanguage,
@@ -272,406 +284,7 @@ export default function HomePage() {
       {/* ------------------------------------------------------------- */}
       {/* PHASE 3: LEFT SIDEBAR (Width: 269px, Fixed Desktop)           */}
       {/* ------------------------------------------------------------- */}
-      <aside style={{
-        width: "269px",
-        minWidth: "269px",
-        height: "100vh",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        background: "linear-gradient(180deg, #031835 0%, #041B38 45%, #051A36 80%, #021227 100%)",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        zIndex: 50,
-        boxShadow: "4px 0 20px rgba(2, 18, 39, 0.4)",
-        overflowY: "auto",
-        overflowX: "hidden"
-      }}>
-        {/* Subtle luminous turquoise-blue wave artwork at the bottom */}
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: "269px",
-          height: "380px",
-          pointerEvents: "none",
-          zIndex: 1,
-          opacity: 0.85
-        }}>
-          <img
-            src="/sidebar-waves.png"
-            alt="Sidebar waves"
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "bottom left", opacity: 0.9 }}
-          />
-        </div>
-
-        {/* Top Section: Logo & Nav items */}
-        <div style={{ position: "relative", zIndex: 10 }}>
-          {/* Logo Brand Block */}
-          <div style={{ padding: "26px 24px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              {/* 3-Part Leaf Icon */}
-              <div style={{ width: "36px", height: "36px", flexShrink: 0, position: "relative" }}>
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  {/* Left leaf: turquoise/cyan */}
-                  <path
-                    d="M18 18 C14 10 7 9 4 13 C2 16 3 23 8 25 C13 26 16 22 18 18 Z"
-                    fill="#06b6d4"
-                  />
-                  {/* Middle leaf: bright cyan/blue */}
-                  <path
-                    d="M18 18 C18 9 14 3 18 2 C22 3 24 9 21 18 Z"
-                    fill="#22d3ee"
-                  />
-                  {/* Right leaf: fresh mint green */}
-                  <path
-                    d="M18 18 C22 10 29 9 32 13 C34 16 33 23 28 25 C23 26 20 22 18 18 Z"
-                    fill="#34d399"
-                  />
-                </svg>
-              </div>
-
-              {/* Brand Typography */}
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", alignItems: "baseline" }}>
-                  <span style={{
-                    color: "#ffffff",
-                    fontSize: "22px",
-                    fontWeight: 700,
-                    letterSpacing: "-0.5px",
-                    lineHeight: 1.1
-                  }}>
-                    Vaani
-                  </span>
-                  <span style={{
-                    color: "#22d3ee",
-                    fontSize: "22px",
-                    fontWeight: 700,
-                    letterSpacing: "-0.5px",
-                    lineHeight: 1.1,
-                    marginLeft: "4px"
-                  }}>
-                    Vision
-                  </span>
-                </div>
-                <span style={{
-                  color: "#94a3b8",
-                  fontSize: "11px",
-                  fontWeight: 400,
-                  letterSpacing: "0.02em",
-                  marginTop: "3px"
-                }}>
-                  AI Voice Health Platform
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Items — Dynamic Role Separation */}
-          <nav style={{ padding: "8px 14px 0", display: "flex", flexDirection: "column", gap: "5px" }}>
-            {/* 1. Home (ACTIVE) */}
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <div style={{
-                height: "46px",
-                borderRadius: "12px",
-                background: "#11579A",
-                display: "flex",
-                alignItems: "center",
-                padding: "0 18px",
-                gap: "14px",
-                boxShadow: "0 2px 10px rgba(17, 87, 154, 0.45)",
-                cursor: "pointer"
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
-                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-                <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 600 }}>Home</span>
-              </div>
-            </Link>
-
-            {userProfile.role === "Doctor / Reviewer" ? (
-              <>
-                {/* Doctor Specific Navigation */}
-                <Link to="/doctor" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "46px",
-                    borderRadius: "12px",
-                    background: "rgba(59, 130, 246, 0.15)",
-                    border: "1px solid rgba(59, 130, 246, 0.3)",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#60a5fa">
-                      <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" />
-                    </svg>
-                    <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 600 }}>Doctor Dashboard</span>
-                  </div>
-                </Link>
-
-                <Link to="/review" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                      <polyline points="9 12 11 14 15 10"></polyline>
-                    </svg>
-                    <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>Review Queue</span>
-                  </div>
-                </Link>
-
-                <Link to="/export" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>Prescriptions</span>
-                  </div>
-                </Link>
-              </>
-            ) : (
-              <>
-                {/* Patient Navigation (Doctor components strictly removed) */}
-                <Link to="/patient" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "46px",
-                    borderRadius: "12px",
-                    background: "rgba(34, 211, 238, 0.1)",
-                    border: "1px solid rgba(34, 211, 238, 0.25)",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#22d3ee">
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 600 }}>My Consultations</span>
-                      <span style={{ fontSize: "9px", padding: "1px 5px", background: "#06b6d4", color: "#000", fontWeight: 700, borderRadius: "4px" }}>PORTAL</span>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Voice Intake Quick Launch */}
-                <div
-                  onClick={() => setIsVoiceModalOpen(true)}
-                  style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}
-                >
-                  <span style={{ fontSize: "18px" }}>🎙️</span>
-                  <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>Voice Consultation</span>
-                </div>
-
-                {/* Doctor Messages */}
-                <div
-                  onClick={() => setIsChatModalOpen(true)}
-                  style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>Doctor Messages</span>
-                </div>
-
-                {/* Prescriptions */}
-                <Link to="/patient" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                    </svg>
-                    <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>My Prescriptions</span>
-                  </div>
-                </Link>
-
-                {/* Community Care UGC */}
-                <Link to="/ugc" style={{ textDecoration: "none" }}>
-                  <div style={{
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0 18px",
-                    gap: "14px",
-                    cursor: "pointer"
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    </svg>
-                    <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: 500 }}>Community Care</span>
-                  </div>
-                </Link>
-
-                {/* Doctor Access Portal Footer */}
-                <div style={{ marginTop: "12px", padding: "10px 14px", background: "rgba(255, 255, 255, 0.04)", borderRadius: "10px", border: "1px dashed rgba(255, 255, 255, 0.12)" }}>
-                  <p style={{ fontSize: "10.5px", color: "#94a3b8", margin: "0 0 4px" }}>Healthcare Professional?</p>
-                  <Link to="/doctor/login" style={{ fontSize: "11.5px", color: "#38bdf8", fontWeight: 700, textDecoration: "none", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span>Doctor Login</span>
-                    <span>→</span>
-                  </Link>
-                </div>
-              </>
-            )}
-          </nav>
-        </div>
-
-        {/* Bottom Section: Language & User Profile */}
-        <div style={{
-          padding: "20px 22px 28px",
-          position: "relative",
-          zIndex: 10
-        }}>
-          {/* Language Selector */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 2px 16px",
-            borderBottom: "1px solid rgba(255, 255, 255, 0.14)",
-            marginBottom: "16px"
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-              </svg>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ color: "#94a3b8", fontSize: "11px", fontWeight: 400 }}>Language</span>
-                <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Hindi</span>
-              </div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-
-          {/* Real Supabase User Profile */}
-          <Link
-            to="/auth/login"
-            style={{ textDecoration: "none" }}
-            title="Switch Account / Sign In"
-          >
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "4px 2px",
-              cursor: "pointer"
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
-                {userProfile.avatarUrl ? (
-                  <img
-                    src={userProfile.avatarUrl}
-                    alt={userProfile.displayName}
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      boxShadow: "0 2px 8px rgba(13, 148, 136, 0.4)",
-                      flexShrink: 0
-                    }}
-                  />
-                ) : (
-                  <div style={{
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #14b8a6, #0d9488)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 2px 8px rgba(13, 148, 136, 0.4)",
-                    flexShrink: 0
-                  }}>
-                    <span style={{
-                      color: "#ffffff",
-                      fontSize: "15px",
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      fontFamily: "'Inter', sans-serif"
-                    }}>
-                      {userProfile.initials}
-                    </span>
-                  </div>
-                )}
-                <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                  <span style={{
-                    color: "#ffffff",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis"
-                  }}>
-                    {userProfile.displayName}
-                  </span>
-                  <span style={{ color: "#94a3b8", fontSize: "11px", fontWeight: 400 }}>
-                    {userProfile.role}
-                  </span>
-                </div>
-              </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-          </Link>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* ------------------------------------------------------------- */}
       {/* PHASE 5: MAIN CONTENT AREA (Begins at x = 269px)              */}
@@ -740,7 +353,10 @@ export default function HomePage() {
               placeholder="Search visits, symptoms, or patients (press Enter)..."
               onKeyDown={(e) => {
                 if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                  navigate(`/review?q=${encodeURIComponent(e.currentTarget.value.trim())}`);
+                  const targetUrl = userProfile.role === "Doctor / Reviewer"
+                    ? `/review?q=${encodeURIComponent(e.currentTarget.value.trim())}`
+                    : `/patient?q=${encodeURIComponent(e.currentTarget.value.trim())}`;
+                  navigate(targetUrl);
                 }
               }}
               style={{
@@ -757,8 +373,12 @@ export default function HomePage() {
 
           {/* Right Header Controls: Notification & Profile */}
           <div style={{ display: "flex", alignItems: "center", gap: "22px", flexShrink: 0 }}>
-            {/* Blue Outline Bell with Live Sync Indicator */}
-            <Link to="/review" style={{ textDecoration: "none" }} title="Clinical Reviewer Queue">
+            {/* Outline Bell with Live Sync Indicator */}
+            <Link
+              to={userProfile.role === "Doctor / Reviewer" ? "/review" : "/patient"}
+              style={{ textDecoration: "none" }}
+              title={userProfile.role === "Doctor / Reviewer" ? "Clinical Reviewer Queue" : "Patient Notifications"}
+            >
               <div style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>

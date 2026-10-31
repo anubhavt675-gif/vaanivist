@@ -1,22 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { broadcastRealtimeEvent } from "../lib/realtime";
-import { getSupabaseBrowserClient } from "../lib/supabase";
 
 interface VoiceConsultationModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultLanguage?: "hindi" | "hinglish" | "english";
-  patientId?: string;
-  patientName?: string;
 }
 
 export default function VoiceConsultationModal({
   isOpen,
   onClose,
   defaultLanguage = "hinglish",
-  patientId: initialPatientId,
-  patientName: initialPatientName,
 }: VoiceConsultationModalProps) {
   const navigate = useNavigate();
   const [selectedLanguage, setSelectedLanguage] = useState<"hindi" | "hinglish" | "english">(defaultLanguage);
@@ -28,29 +23,6 @@ export default function VoiceConsultationModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
   const [audioBars, setAudioBars] = useState<number[]>([15, 25, 40, 20, 50, 30, 60, 25, 15]);
-  const [patientId, setPatientId] = useState<string>(initialPatientId || "");
-  const [patientName, setPatientName] = useState<string>(initialPatientName || "");
-
-  useEffect(() => {
-    if (initialPatientId) setPatientId(initialPatientId);
-    if (initialPatientName) setPatientName(initialPatientName);
-
-    if (!initialPatientId || !initialPatientName) {
-      const supabase = getSupabaseBrowserClient();
-      if (supabase) {
-        supabase.auth.getUser().then(({ data: { user } }) => {
-          if (user) {
-            setPatientId(user.id);
-            setPatientName(
-              user.user_metadata?.full_name ||
-              user.email?.split("@")[0] ||
-              "Patient"
-            );
-          }
-        });
-      }
-    }
-  }, [initialPatientId, initialPatientName]);
 
   const recognitionRef = useRef<any>(null);
   const timerRef = useRef<any>(null);
@@ -220,7 +192,7 @@ export default function VoiceConsultationModal({
     }
 
     setIsSubmitting(true);
-    setStatusMsg("Submitting symptoms & generating AI clinical analysis with Gemini...");
+    setStatusMsg("Submitting symptoms & generating AI clinical analysis with Groq...");
 
     try {
       const res = await fetch("/api/consultations", {
@@ -230,8 +202,7 @@ export default function VoiceConsultationModal({
           source_text: textToSubmit,
           source_language: selectedLanguage,
           input_method: "voice",
-          patient_name: patientName || "Patient",
-          patient_id: patientId || undefined,
+          patient_name: "Rohan Kumar",
           patient_age: 28,
           patient_gender: "Male",
           audio_duration: seconds,
@@ -591,7 +562,7 @@ export default function VoiceConsultationModal({
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: "#0284c7", fontSize: "13px" }}>🤖</span>
             <span style={{ fontSize: "11px", color: "#64748b" }}>
-              Structured with Google Gemini AI for Dr. Priya Sharma
+              Structured with Groq AI for Dr. Priya Sharma
             </span>
           </div>
 

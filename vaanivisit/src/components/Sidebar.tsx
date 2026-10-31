@@ -1,569 +1,571 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getSupabaseBrowserClient } from "../lib/supabase";
 import { useUserRole } from "../lib/useUserRole";
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-  badge?: number | string;
-  badgeColor?: string;
-  onClick?: () => void;
-}
+import { subscribeToRealtimeEvents } from "../lib/realtime";
 
 export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
-  const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
-  const isDoctorRoute = pathname.startsWith("/doctor") || pathname.startsWith("/review");
+  const { role: authRole } = useUserRole();
 
-  const { role: authRole, displayName: authDisplayName } = useUserRole();
-
-  // Derive which sidebar to show:
-  // If authenticated role resolves, prefer that; fall back to route sniffing during load.
-  const isDoctor = authRole === "doctor" || (authRole === "loading" && isDoctorRoute);
-
-  const [currentLang, setCurrentLang] = useState<"hi" | "en">("hi");
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [profileData, setProfileData] = useState<{ displayName: string; role: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{
+    id: string;
+    displayName: string;
+    role: string;
+    email: string;
+    avatarUrl: string | null;
+    initials: string;
+  }>({
+    id: "",
+    displayName: "Anubhav kumar thakur",
+    role: "Patient",
+    email: "",
+    avatarUrl: null,
+    initials: "A",
+  });
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
-    if (supabase) {
-      supabase.auth.getUser().then(async ({ data: { user } }) => {
+    if (!supabase) return;
+
+    const loadRealUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          setCurrentUser(user);
           const { data: profile } = await supabase
             .from("profiles")
-            .select("display_name, role")
+            .select("*")
             .eq("id", user.id)
             .maybeSingle();
-          if (profile) {
-            setProfileData({
-              displayName: profile.display_name || user.email?.split("@")[0] || "User",
-              role: profile.role === "reviewer" ? "Doctor" : "Patient",
-            });
-          }
-        }
-      });
 
-      const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        const u = session?.user || null;
-        setCurrentUser(u);
-        if (u) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("display_name, role")
-            .eq("id", u.id)
-            .maybeSingle();
-          if (profile) {
-            setProfileData({
-              displayName: profile.display_name || u.email?.split("@")[0] || "User",
-              role: profile.role === "reviewer" ? "Doctor" : "Patient",
-            });
-          }
+          const name =
+            profile?.display_name ||
+            user.user_metadata?.full_name ||
+            user.email?.split("@")[0] ||
+            "Anubhav kumar thakur";
+          const role = profile?.role === "reviewer" ? "Doctor / Reviewer" : "Patient";
+          const initials = name
+            .split(" ")
+            .filter(Boolean)
+            .map((part: string) => part[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2) || "A";
+
+          setUserProfile({
+            id: user.id,
+            displayName: name,
+            role,
+            email: user.email || "",
+            avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || null,
+            initials,
+          });
         } else {
-          setProfileData(null);
-        }
-      });
+          // If not authenticated, load the active primary profile from Supabase
+          const { data: defaultProfile } = await supabase
+            .from("profiles")
+            .select("*")
+            .limit(1)
+            .maybeSingle();
 
-      return () => {
-        authListener?.subscription?.unsubscribe();
-      };
-    }
+          if (defaultProfile) {
+            const name = defaultProfile.display_name || "Anubhav kumar thakur";
+            const role = defaultProfile.role === "reviewer" ? "Doctor / Reviewer" : "Patient";
+            const initials = name
+              .split(" ")
+              .filter(Boolean)
+              .map((part: string) => part[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2) || "A";
+
+            setUserProfile({
+              id: defaultProfile.id,
+              displayName: name,
+              role,
+              email: defaultProfile.role === "reviewer" ? "dr.priya@vaanivisit.demo" : "rohan.kumar@vaanivisit.demo",
+              avatarUrl: defaultProfile.avatar_url || null,
+              initials,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load user profile in Sidebar:", err);
+      }
+    };
+
+    loadRealUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        loadRealUser();
+      }
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
-  const handleSignOut = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const supabase = getSupabaseBrowserClient();
-    if (supabase) {
-      await supabase.auth.signOut();
-      setCurrentUser(null);
-      navigate("/auth/login");
-    }
-  };
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  // SVGs for clean UI
-  const HomeIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-    </svg>
-  );
+  useEffect(() => {
+    let isMounted = true;
+    const fetchUnread = async () => {
+      try {
+        const res = await fetch("/api/conversations?role=patient");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            setUnreadCount(data.total_unread || 0);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
 
-  const DashboardIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-    </svg>
-  );
+    fetchUnread();
+    const unsub = subscribeToRealtimeEvents(() => {
+      fetchUnread();
+    });
 
-  const RequestsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-      <rect x="9" y="3" width="6" height="4" rx="2" />
-      <path d="M9 12h6m-6 4h6" />
-    </svg>
-  );
+    const interval = setInterval(fetchUnread, 4000);
 
-  const PatientsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
+    return () => {
+      isMounted = false;
+      unsub();
+      clearInterval(interval);
+    };
+  }, []);
 
-  const StethoscopeIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M4.5 3v5a4.5 4.5 0 0 0 9 0V3" />
-      <path d="M9 12.5V17a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3v-1.5" />
-      <circle cx="18" cy="14" r="2" />
-    </svg>
-  );
+  const isHomeActive = pathname === "/" || pathname === "";
+  const isPatientActive = pathname.startsWith("/patient");
+  const isDoctorActive = pathname.startsWith("/doctor");
+  const isAIDraftActive = pathname.startsWith("/ai-draft");
+  const isMessagesActive = pathname.startsWith("/messages");
+  const isReviewActive = pathname.startsWith("/review");
+  const isExportActive = pathname.startsWith("/export");
+  const isUGCActive = pathname.startsWith("/ugc");
+  const isProfessionalActive = pathname.startsWith("/professional") || pathname.startsWith("/professinal");
 
-  const CalendarIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  );
-
-  const MessagesIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-
-  const PrescriptionsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
-  );
-
-  const RecordsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-
-  const NotificationsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
-
-  const SettingsIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  );
-
-  const AvailabilityIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-
-  // Navigation Items according to active role / route
-  const patientNavItems: NavItem[] = [
-    { label: "Home", href: "/", icon: <HomeIcon /> },
-    { label: "AI Consultation", href: "/patient", icon: <StethoscopeIcon /> },
-    { label: "My Requests", href: "/patient/requests", icon: <RequestsIcon /> },
-    { label: "My Doctors", href: "/patient/doctors", icon: <PatientsIcon /> },
-    { label: "Messages", href: "/patient/messages", icon: <MessagesIcon />, badge: 3, badgeColor: "#ef4444", onClick: onOpenChat },
-    { label: "Appointments", href: "/patient/appointments", icon: <CalendarIcon /> },
-    { label: "Medical Records", href: "/patient/records", icon: <RecordsIcon /> },
-    { label: "Prescriptions", href: "/patient/prescriptions", icon: <PrescriptionsIcon /> },
-    { label: "Notifications", href: "/patient/notifications", icon: <NotificationsIcon />, badge: 2, badgeColor: "#ef4444" },
-    { label: "Profile Settings", href: "/patient/profile", icon: <SettingsIcon /> },
-  ];
-
-  const doctorNavItems: NavItem[] = [
-    { label: "Dashboard", href: "/doctor", icon: <DashboardIcon /> },
-    { label: "Incoming Requests", href: "/doctor#requests", icon: <RequestsIcon />, badge: 5, badgeColor: "#3b82f6" },
-    { label: "My Patients", href: "/doctor#patients", icon: <PatientsIcon /> },
-    { label: "Appointments", href: "/doctor#schedule", icon: <CalendarIcon /> },
-    { label: "Messages", href: "/doctor#messages", icon: <MessagesIcon />, badge: 2, badgeColor: "#ef4444", onClick: onOpenChat },
-    { label: "Consultations", href: "/review", icon: <StethoscopeIcon /> },
-    { label: "Prescriptions", href: "/export", icon: <PrescriptionsIcon /> },
-    { label: "Medical Records", href: "/doctor#records", icon: <RecordsIcon /> },
-    { label: "Notifications", href: "/doctor#notifications", icon: <NotificationsIcon />, badge: 3, badgeColor: "#ef4444" },
-    { label: "Profile", href: "/doctor#profile", icon: <SettingsIcon /> },
-    { label: "Availability", href: "/doctor#availability", icon: <AvailabilityIcon /> },
-  ];
-
-  const activeNavItems = isDoctor ? doctorNavItems : patientNavItems;
+  // Role-based navigation: Review option is ONLY shown for authenticated doctors / medical reviewers
+  // or when explicitly active in doctor/professional workflow. It is strictly hidden for patient accounts.
+  const isDoctorOrReviewer =
+    (authRole === "doctor" ||
+      userProfile.role === "Doctor / Reviewer" ||
+      userProfile.role === "Doctor" ||
+      ((pathname.startsWith("/doctor") || pathname.startsWith("/professional") || pathname.startsWith("/review")) &&
+        authRole !== "patient" &&
+        userProfile.role !== "Patient")) &&
+    authRole !== "patient" &&
+    userProfile.role !== "Patient";
 
   return (
-    <aside className="sidebar">
-      {/* Ambient background glow / waves */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "240px",
-          background:
-            "radial-gradient(circle at 10% 100%, rgba(6, 182, 212, 0.16) 0%, rgba(59, 130, 246, 0.08) 50%, transparent 100%)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Brand Header */}
-      <div style={{ padding: "20px 18px 14px", zIndex: 1 }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "4px",
-          }}
-        >
-          {/* Logo mark */}
-          <div
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "10px",
-              background: "linear-gradient(135deg, #06b6d4, #2563eb)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 12px rgba(6, 182, 212, 0.4)",
-              flexShrink: 0,
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"
-                fill="#0891b2"
-              />
-              <path
-                d="M9 12l2 2 4-4"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <span
-                style={{
-                  color: "#ffffff",
-                  fontWeight: 800,
-                  fontSize: "17px",
-                  letterSpacing: "-0.4px",
-                }}
-              >
-                Vaani
-              </span>
-              <span
-                style={{
-                  color: "#22d3ee",
-                  fontWeight: 800,
-                  fontSize: "17px",
-                  letterSpacing: "-0.4px",
-                  marginLeft: "4px",
-                }}
-              >
-                Vision
-              </span>
-            </div>
-            <p
-              style={{
-                fontSize: "10px",
-                color: "#7288aa",
-                margin: 0,
-                fontWeight: 500,
-                letterSpacing: "0.02em",
-              }}
-            >
-              AI Voice Health Platform
-            </p>
-          </div>
-        </div>
-
-        {/* Portal Badge — shows current role only (no cross-portal switching) */}
-        <div
-          style={{
-            marginTop: "12px",
-            display: "flex",
-            background: "rgba(255, 255, 255, 0.08)",
-            borderRadius: "8px",
-            padding: "3px",
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "5px 0",
-              fontSize: "11px",
-              fontWeight: 700,
-              borderRadius: "6px",
-              color: "#ffffff",
-              background: isDoctor
-                ? "linear-gradient(135deg, #2563eb, #0d9488)"
-                : "linear-gradient(135deg, #06b6d4, #2563eb)",
-            }}
-          >
-            {isDoctor ? "Doctor Portal" : "Patient Portal"}
-          </div>
-        </div>
+    <aside style={{
+      width: "269px",
+      minWidth: "269px",
+      height: "100vh",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      background: "linear-gradient(180deg, #031835 0%, #041B38 45%, #051A36 80%, #021227 100%)",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      zIndex: 50,
+      boxShadow: "4px 0 20px rgba(2, 18, 39, 0.4)",
+      overflowY: "auto",
+      overflowX: "hidden"
+    }}>
+      {/* Subtle luminous turquoise-blue wave artwork at the bottom */}
+      <div style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        width: "269px",
+        height: "380px",
+        pointerEvents: "none",
+        zIndex: 1,
+        opacity: 0.85
+      }}>
+        <img
+          src="/sidebar-waves.png"
+          alt="Sidebar waves"
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "bottom left", opacity: 0.9 }}
+        />
       </div>
 
-      {/* Navigation */}
-      <nav
-        style={{
-          flex: 1,
-          padding: "6px 0",
-          zIndex: 1,
-          overflowY: "auto",
-        }}
-      >
-        {activeNavItems.map((item) => {
-          const currentFull = location.pathname + location.hash;
-          const isActive =
-            location.pathname === item.href ||
-            currentFull === item.href ||
-            (item.href === "/" && location.pathname === "/") ||
-            (item.href === "/patient" && (location.pathname === "/patient" || location.pathname === "/patient/dashboard") && !location.hash) ||
-            (item.href === "/doctor" && (location.pathname === "/doctor" || location.pathname === "/doctor/dashboard") && !location.hash);
+      {/* Top Section: Logo & Nav items */}
+      <div style={{ position: "relative", zIndex: 10 }}>
+        {/* Logo Brand Block */}
+        <div style={{ padding: "26px 24px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* 3-Part Leaf Icon */}
+            <div style={{ width: "36px", height: "36px", flexShrink: 0, position: "relative" }}>
+              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                {/* Left leaf: turquoise/cyan */}
+                <path
+                  d="M18 18 C14 10 7 9 4 13 C2 16 3 23 8 25 C13 26 16 22 18 18 Z"
+                  fill="#06b6d4"
+                />
+                {/* Middle leaf: bright cyan/blue */}
+                <path
+                  d="M18 18 C18 9 14 3 18 2 C22 3 24 9 21 18 Z"
+                  fill="#22d3ee"
+                />
+                {/* Right leaf: fresh mint green */}
+                <path
+                  d="M18 18 C22 10 29 9 32 13 C34 16 33 23 28 25 C23 26 20 22 18 18 Z"
+                  fill="#34d399"
+                />
+              </svg>
+            </div>
 
-          return (
-            <Link
-              key={item.label}
-              to={item.href}
-              onClick={(e) => {
-                if (item.onClick) {
-                  e.preventDefault();
-                  item.onClick();
-                }
-              }}
-              className={`sidebar-nav-item ${isActive ? "active" : ""}`}
-              style={{
+            {/* Brand Typography */}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", alignItems: "baseline" }}>
+                <span style={{
+                  color: "#ffffff",
+                  fontSize: "22px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.5px",
+                  lineHeight: 1.1
+                }}>
+                  Vaani
+                </span>
+                <span style={{
+                  color: "#22d3ee",
+                  fontSize: "22px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.5px",
+                  lineHeight: 1.1,
+                  marginLeft: "4px"
+                }}>
+                  Vision
+                </span>
+              </div>
+              <span style={{
+                color: "#94a3b8",
+                fontSize: "11px",
+                fontWeight: 400,
+                letterSpacing: "0.02em",
+                marginTop: "3px"
+              }}>
+                AI Voice Health Platform
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Items */}
+        <nav style={{ padding: "8px 14px 0", display: "flex", flexDirection: "column", gap: "5px" }}>
+          {/* 1. Home */}
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <div style={{
+              height: "46px",
+              borderRadius: "12px",
+              background: isHomeActive ? "#11579A" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 18px",
+              gap: "14px",
+              boxShadow: isHomeActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+              cursor: "pointer"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              </svg>
+              <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isHomeActive ? 600 : 500 }}>Home</span>
+            </div>
+          </Link>
+
+          {/* 3. Doctor Portal (Shown ONLY for Authorized Doctors & Medical Reviewers - Hidden for Patients) */}
+          {isDoctorOrReviewer && (
+            <Link to="/doctor" style={{ textDecoration: "none" }}>
+              <div style={{
+                height: "46px",
+                borderRadius: "12px",
+                background: isDoctorActive ? "#11579A" : "rgba(59, 130, 246, 0.1)",
+                border: isDoctorActive ? "none" : "1px solid rgba(59, 130, 246, 0.25)",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                padding: "9px 18px",
-                margin: "2px 8px",
-                borderRadius: "10px",
-                textDecoration: "none",
-                color: isActive ? "#ffffff" : "#94a3b8",
-                background: isActive
-                  ? "linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(37, 99, 235, 0.35))"
-                  : "transparent",
-                fontWeight: isActive ? 700 : 500,
-                fontSize: "13px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <span style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-                  {item.icon}
-                </span>
-                <span>{item.label}</span>
+                padding: "0 18px",
+                gap: "14px",
+                boxShadow: isDoctorActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+                cursor: "pointer"
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={isDoctorActive ? "#ffffff" : "#60a5fa"}>
+                  <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z" />
+                </svg>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isDoctorActive ? 600 : 500 }}>Doctor Portal</span>
+                  <span style={{ fontSize: "9px", padding: "1px 5px", background: "#3b82f6", color: "#fff", fontWeight: 700, borderRadius: "4px" }}>MD</span>
+                </div>
               </div>
-              {item.badge !== undefined && (
-                <span
-                  style={{
-                    background: item.badgeColor || "#ef4444",
-                    color: "white",
-                    fontSize: "10px",
-                    fontWeight: 800,
-                    padding: "2px 7px",
-                    borderRadius: "10px",
-                    lineHeight: "1.2",
-                  }}
-                >
-                  {item.badge}
+            </Link>
+          )}
+
+          {/* 4. AI Draft */}
+          <Link to="/ai-draft" style={{ textDecoration: "none" }}>
+            <div style={{
+              height: "46px",
+              borderRadius: "12px",
+              background: isAIDraftActive ? "#11579A" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 18px",
+              gap: "14px",
+              boxShadow: isAIDraftActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+              cursor: "pointer"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isAIDraftActive ? 600 : 500 }}>AI Draft</span>
+            </div>
+          </Link>
+
+          {/* 5. Messages */}
+          <Link to="/messages" style={{ textDecoration: "none" }}>
+            <div style={{
+              height: "46px",
+              borderRadius: "12px",
+              background: isMessagesActive ? "#11579A" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 18px",
+              gap: "14px",
+              boxShadow: isMessagesActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+              cursor: "pointer",
+              position: "relative"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isMessagesActive ? 600 : 500 }}>Messages</span>
+              {unreadCount > 0 && (
+                <span style={{
+                  marginLeft: "auto",
+                  background: "#ef4444",
+                  color: "#ffffff",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  minWidth: "18px",
+                  height: "18px",
+                  borderRadius: "9px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0 5px",
+                  boxShadow: "0 1px 4px rgba(239, 68, 68, 0.4)"
+                }}>
+                  {unreadCount}
                 </span>
               )}
-            </Link>
-          );
-        })}
-      </nav>
+            </div>
+          </Link>
 
-      {/* Bottom section */}
-      <div
-        style={{
-          padding: "14px 16px",
-          zIndex: 1,
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-          background: "rgba(10, 20, 48, 0.5)",
-        }}
-      >
-        {/* Language selector toggle */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "12px",
-            padding: "2px 4px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#738aa8">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-            </svg>
-            <span style={{ fontSize: "11px", color: "#8ca2c4", fontWeight: 500 }}>
-              Language
-            </span>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              background: "rgba(255, 255, 255, 0.08)",
-              borderRadius: "14px",
-              padding: "2px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            }}
-          >
-            <button
-              onClick={() => setCurrentLang("hi")}
-              style={{
-                background:
-                  currentLang === "hi"
-                    ? "linear-gradient(135deg, #06b6d4, #2563eb)"
-                    : "transparent",
-                color: currentLang === "hi" ? "#ffffff" : "#7288aa",
-                border: "none",
+          {/* 5. Review (Shown ONLY for Authorized Doctors & Medical Reviewers - Hidden for Patients) */}
+          {isDoctorOrReviewer && (
+            <Link to="/review" style={{ textDecoration: "none" }}>
+              <div style={{
+                height: "46px",
                 borderRadius: "12px",
-                padding: "2px 8px",
-                fontSize: "11px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              हिन्दी
-            </button>
-            <button
-              onClick={() => setCurrentLang("en")}
-              style={{
-                background:
-                  currentLang === "en"
-                    ? "linear-gradient(135deg, #06b6d4, #2563eb)"
-                    : "transparent",
-                color: currentLang === "en" ? "#ffffff" : "#7288aa",
-                border: "none",
-                borderRadius: "12px",
-                padding: "2px 8px",
-                fontSize: "11px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-
-        {/* User Card Matching Screenshots */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "8px 10px",
-            background: "rgba(255, 255, 255, 0.06)",
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-            <div
-              style={{
-                width: "34px",
-                height: "34px",
-                borderRadius: "50%",
-                background: isDoctor
-                  ? "linear-gradient(135deg, #2563eb, #0d9488)"
-                  : "linear-gradient(135deg, #06b6d4, #2563eb)",
+                background: isReviewActive ? "#11579A" : "transparent",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                fontSize: "13px",
-                fontWeight: 800,
-                color: "white",
-                flexShrink: 0,
-                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              {isDoctor ? "D" : profileData?.displayName ? profileData.displayName[0].toUpperCase() : "A"}
-            </div>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <p
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "#e2eafc",
-                  margin: 0,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {isDoctor
-                  ? "Dr. Priya Sharma"
-                  : profileData?.displayName || authDisplayName || "Patient"}
-              </p>
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#7e95b8",
-                  margin: 0,
-                }}
-              >
-                {isDoctor ? "Doctor • General Physician" : "Patient Account"}
-              </p>
-            </div>
-          </div>
+                padding: "0 18px",
+                gap: "14px",
+                boxShadow: isReviewActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+                cursor: "pointer"
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <polyline points="9 12 11 14 15 10"></polyline>
+                </svg>
+                <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isReviewActive ? 600 : 500 }}>Review</span>
+              </div>
+            </Link>
+          )}
 
-          <button
-            onClick={handleSignOut}
-            title="Logout"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "4px",
+          {/* 6. Export */}
+          <Link to="/export" style={{ textDecoration: "none" }}>
+            <div style={{
+              height: "46px",
+              borderRadius: "12px",
+              background: isExportActive ? "#11579A" : "transparent",
               display: "flex",
               alignItems: "center",
-              gap: "4px",
-              fontSize: "11px",
-            }}
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              padding: "0 18px",
+              gap: "14px",
+              boxShadow: isExportActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+              cursor: "pointer"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isExportActive ? 600 : 500 }}>Export</span>
+            </div>
+          </Link>
+
+          {/* 7. UGC */}
+          <Link to="/ugc" style={{ textDecoration: "none" }}>
+            <div style={{
+              height: "46px",
+              borderRadius: "12px",
+              background: isUGCActive ? "#11579A" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 18px",
+              gap: "14px",
+              boxShadow: isUGCActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+              cursor: "pointer"
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isUGCActive ? 600 : 500 }}>UGC</span>
+            </div>
+          </Link>
+
+          {/* 8. Professional (Shown ONLY for Authorized Doctors & Medical Reviewers - Hidden for Patients) */}
+          {isDoctorOrReviewer && (
+            <Link to="/professional" style={{ textDecoration: "none" }}>
+              <div style={{
+                height: "46px",
+                borderRadius: "12px",
+                background: isProfessionalActive ? "#11579A" : "transparent",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 18px",
+                gap: "14px",
+                boxShadow: isProfessionalActive ? "0 2px 10px rgba(17, 87, 154, 0.45)" : "none",
+                cursor: "pointer"
+              }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+                <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: isProfessionalActive ? 600 : 500 }}>Professional</span>
+              </div>
+            </Link>
+          )}
+        </nav>
+      </div>
+
+      {/* Bottom Section: Language & User Profile */}
+      <div style={{
+        padding: "20px 22px 28px",
+        position: "relative",
+        zIndex: 10
+      }}>
+        {/* Language Selector */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 2px 16px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.14)",
+          marginBottom: "16px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
             </svg>
-          </button>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ color: "#94a3b8", fontSize: "11px", fontWeight: 400 }}>Language</span>
+              <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 600 }}>Hindi</span>
+            </div>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
+
+        {/* Real Supabase User Profile */}
+        <Link
+          to="/auth/login"
+          style={{ textDecoration: "none" }}
+          title="Switch Account / Sign In"
+        >
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "4px 2px",
+            cursor: "pointer"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+              {userProfile.avatarUrl ? (
+                <img
+                  src={userProfile.avatarUrl}
+                  alt={userProfile.displayName}
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    boxShadow: "0 2px 8px rgba(13, 148, 136, 0.4)",
+                    flexShrink: 0
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #14b8a6, #0d9488)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(13, 148, 136, 0.4)",
+                  flexShrink: 0
+                }}>
+                  <span style={{
+                    color: "#ffffff",
+                    fontSize: "15px",
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    fontFamily: "'Inter', sans-serif"
+                  }}>
+                    {userProfile.initials}
+                  </span>
+                </div>
+              )}
+              <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                <span style={{
+                  color: "#ffffff",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis"
+                }}>
+                  {userProfile.displayName}
+                </span>
+                <span style={{ color: "#94a3b8", fontSize: "11px", fontWeight: 400 }}>
+                  {userProfile.role}
+                </span>
+              </div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+        </Link>
       </div>
     </aside>
   );

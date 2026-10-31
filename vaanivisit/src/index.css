@@ -86,8 +86,8 @@ html, body {
 
 /* Sidebar */
 .sidebar {
-  background: linear-gradient(180deg, #0c1a3a 0%, #0a1532 50%, #081128 100%);
-  width: 210px;
+  background: linear-gradient(180deg, #031835 0%, #041B38 45%, #051A36 80%, #021227 100%);
+  width: 269px;
   min-height: 100vh;
   position: fixed;
   top: 0;
@@ -96,6 +96,7 @@ html, body {
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 4px 0 20px rgba(2, 18, 39, 0.4);
 }
 
 .sidebar-nav-item {
@@ -145,9 +146,9 @@ html, body {
 
 /* Main content offset for sidebar */
 .main-content {
-  margin-left: 210px;
-  width: calc(100% - 210px);
-  max-width: calc(100% - 210px);
+  margin-left: 269px;
+  width: calc(100% - 269px);
+  max-width: calc(100% - 269px);
   min-height: 100vh;
   display: flex;
   flex-direction: column;

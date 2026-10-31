@@ -99,7 +99,7 @@ export default function LoginPage() {
             is_active: true,
           });
         }
-        // Redirect patient to Home Page
+        // Redirect patient to Home Page (/)
         navigate("/");
       }
     } catch (e) {
@@ -394,7 +394,7 @@ export default function LoginPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "20px 32px",
+          padding: "20px 36px",
           boxSizing: "border-box",
           position: "relative",
           background: "#f1f8fe",
@@ -406,10 +406,10 @@ export default function LoginPage() {
           style={{
             background: "#ffffff",
             borderRadius: "24px",
-            padding: "30px 36px",
+            padding: "24px 30px",
             width: "100%",
-            maxWidth: "480px",
-            boxShadow: "0 15px 50px rgba(16, 43, 70, 0.08), 0 2px 6px rgba(16, 43, 70, 0.04)",
+            maxWidth: "420px",
+            boxShadow: "0 12px 40px rgba(16, 43, 70, 0.07), 0 2px 6px rgba(16, 43, 70, 0.04)",
             border: "1px solid rgba(226, 234, 244, 0.85)",
             display: "flex",
             flexDirection: "column",
@@ -425,11 +425,11 @@ export default function LoginPage() {
               display: "inline-flex",
               alignItems: "center",
               gap: "6px",
-              fontSize: "12.5px",
+              fontSize: "12px",
               fontWeight: 600,
               color: "#2563eb",
               textDecoration: "none",
-              marginBottom: "4px",
+              marginBottom: "2px",
               width: "fit-content",
             }}
           >
@@ -442,10 +442,10 @@ export default function LoginPage() {
             style={{
               display: "flex",
               justifyContent: "center",
-              margin: "2px 0 8px",
+              margin: "2px 0 6px",
             }}
           >
-            <svg width="38" height="38" viewBox="0 0 40 40" fill="none">
+            <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
               <ellipse
                 cx="14"
                 cy="23"
@@ -459,13 +459,13 @@ export default function LoginPage() {
           </div>
 
           {/* 3. Welcome Back & Subtitle */}
-          <div style={{ textAlign: "center", marginBottom: "16px" }}>
+          <div style={{ textAlign: "center", marginBottom: "14px" }}>
             <h2
               style={{
-                fontSize: "25px",
+                fontSize: "23px",
                 fontWeight: 800,
                 color: "#071D35",
-                margin: "0 0 4px",
+                margin: "0 0 3px",
                 letterSpacing: "-0.5px",
               }}
             >
@@ -473,7 +473,7 @@ export default function LoginPage() {
             </h2>
             <p
               style={{
-                fontSize: "13.5px",
+                fontSize: "12.5px",
                 color: "#64748B",
                 margin: 0,
                 fontWeight: 500,
@@ -489,13 +489,13 @@ export default function LoginPage() {
           {errorMsg && (
             <div
               style={{
-                padding: "9px 14px",
+                padding: "8px 12px",
                 background: "#fef2f2",
                 border: "1px solid #fecaca",
-                borderRadius: "10px",
+                borderRadius: "8px",
                 color: "#b91c1c",
-                fontSize: "11.5px",
-                marginBottom: "12px",
+                fontSize: "11px",
+                marginBottom: "10px",
                 lineHeight: 1.4,
               }}
             >
@@ -506,13 +506,13 @@ export default function LoginPage() {
           {successMsg && (
             <div
               style={{
-                padding: "9px 14px",
+                padding: "8px 12px",
                 background: "#f0fdf4",
                 border: "1px solid #bbf7d0",
-                borderRadius: "10px",
+                borderRadius: "8px",
                 color: "#15803d",
-                fontSize: "11.5px",
-                marginBottom: "12px",
+                fontSize: "11px",
+                marginBottom: "10px",
                 lineHeight: 1.4,
               }}
             >
@@ -522,9 +522,9 @@ export default function LoginPage() {
 
           {/* Login Form OR Reset Password Form */}
           {isResetMode ? (
-            <form onSubmit={handleUpdatePassword} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <form onSubmit={handleUpdatePassword} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "12.5px", fontWeight: 600, color: "#102B46", marginBottom: "5px" }}>
+                <label style={{ display: "block", fontSize: "11.5px", fontWeight: 600, color: "#102B46", marginBottom: "4px" }}>
                   New Password
                 </label>
                 <input
@@ -535,11 +535,11 @@ export default function LoginPage() {
                   placeholder="Enter your new secure password"
                   style={{
                     width: "100%",
-                    height: "44px",
-                    padding: "0 14px",
-                    borderRadius: "12px",
+                    height: "40px",
+                    padding: "0 12px",
+                    borderRadius: "10px",
                     border: "1.5px solid #dce7f1",
-                    fontSize: "13px",
+                    fontSize: "12px",
                     color: "#142B45",
                     outline: "none",
                     boxSizing: "border-box",
@@ -550,12 +550,12 @@ export default function LoginPage() {
                 type="submit"
                 disabled={resetLoading}
                 style={{
-                  height: "46px",
-                  borderRadius: "12px",
+                  height: "42px",
+                  borderRadius: "10px",
                   border: "none",
                   background: "linear-gradient(90deg, #00B4D8 0%, #1A73E8 50%, #7C3AED 100%)",
                   color: "#ffffff",
-                  fontSize: "14.5px",
+                  fontSize: "13.5px",
                   fontWeight: 700,
                   cursor: resetLoading ? "not-allowed" : "pointer",
                 }}
@@ -564,16 +564,16 @@ export default function LoginPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {/* Email or Phone Number Input */}
               <div>
                 <label
                   style={{
                     display: "block",
-                    fontSize: "12.5px",
+                    fontSize: "11.5px",
                     fontWeight: 600,
                     color: "#102B46",
-                    marginBottom: "6px",
+                    marginBottom: "4px",
                   }}
                 >
                   Email or Phone Number
@@ -582,16 +582,16 @@ export default function LoginPage() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "10px",
-                    height: "46px",
-                    padding: "0 14px",
-                    borderRadius: "12px",
+                    gap: "8px",
+                    height: "40px",
+                    padding: "0 12px",
+                    borderRadius: "10px",
                     border: "1.5px solid #dce7f1",
                     background: "#ffffff",
                   }}
                 >
                   {/* Mail Icon */}
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <rect width="20" height="16" x="2" y="4" rx="2" />
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                   </svg>
@@ -605,7 +605,7 @@ export default function LoginPage() {
                       border: "none",
                       background: "transparent",
                       outline: "none",
-                      fontSize: "13.5px",
+                      fontSize: "12px",
                       color: "#142B45",
                       width: "100%",
                     }}
@@ -618,10 +618,10 @@ export default function LoginPage() {
                 <label
                   style={{
                     display: "block",
-                    fontSize: "12.5px",
+                    fontSize: "11.5px",
                     fontWeight: 600,
                     color: "#102B46",
-                    marginBottom: "6px",
+                    marginBottom: "4px",
                   }}
                 >
                   Password
@@ -630,16 +630,16 @@ export default function LoginPage() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "10px",
-                    height: "46px",
-                    padding: "0 14px",
-                    borderRadius: "12px",
+                    gap: "8px",
+                    height: "40px",
+                    padding: "0 12px",
+                    borderRadius: "10px",
                     border: "1.5px solid #dce7f1",
                     background: "#ffffff",
                   }}
                 >
                   {/* Lock Icon */}
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
                     <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                   </svg>
@@ -653,7 +653,7 @@ export default function LoginPage() {
                       border: "none",
                       background: "transparent",
                       outline: "none",
-                      fontSize: "13.5px",
+                      fontSize: "12px",
                       color: "#142B45",
                       width: "100%",
                     }}
@@ -674,14 +674,14 @@ export default function LoginPage() {
                     title={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
                         <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
                         <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
                         <line x1="2" x2="22" y1="2" y2="22" />
                       </svg>
                     ) : (
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
@@ -691,7 +691,7 @@ export default function LoginPage() {
               </div>
 
               {/* Forgot Password Link */}
-              <div style={{ textAlign: "right", marginTop: "-2px" }}>
+              <div style={{ textAlign: "right", marginTop: "-3px" }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -702,7 +702,7 @@ export default function LoginPage() {
                     background: "transparent",
                     border: "none",
                     color: "#2563eb",
-                    fontSize: "12px",
+                    fontSize: "11px",
                     fontWeight: 600,
                     cursor: "pointer",
                     padding: 0,
@@ -717,25 +717,25 @@ export default function LoginPage() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  height: "48px",
-                  borderRadius: "12px",
+                  height: "44px",
+                  borderRadius: "10px",
                   border: "none",
                   background: "linear-gradient(90deg, #00B4D8 0%, #1A73E8 50%, #7C3AED 100%)",
                   color: "#ffffff",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
-                  boxShadow: "0 6px 20px rgba(26, 115, 232, 0.32)",
+                  boxShadow: "0 4px 14px rgba(26, 115, 232, 0.28)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  marginTop: "4px",
-                  transition: "all 0.15s ease",
+                  gap: "6px",
+                  marginTop: "2px",
+                  transition: "opacity 0.15s ease",
                 }}
               >
                 <span>{loading ? "Verifying..." : "Log In"}</span>
-                {!loading && <span style={{ fontSize: "16px" }}>→</span>}
+                {!loading && <span style={{ fontSize: "14px" }}>→</span>}
               </button>
             </form>
           )}
@@ -745,14 +745,14 @@ export default function LoginPage() {
             style={{
               display: "flex",
               alignItems: "center",
-              margin: "14px 0",
+              margin: "12px 0",
             }}
           >
             <div style={{ flex: 1, height: "1px", background: "#e2e8f0" }} />
             <span
               style={{
-                padding: "0 12px",
-                fontSize: "11px",
+                padding: "0 10px",
+                fontSize: "10px",
                 fontWeight: 600,
                 color: "#94a3b8",
                 textTransform: "uppercase",
@@ -768,8 +768,8 @@ export default function LoginPage() {
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "12px",
-              marginBottom: "14px",
+              gap: "10px",
+              marginBottom: "12px",
             }}
           >
             {/* Google OAuth Button */}
@@ -779,22 +779,22 @@ export default function LoginPage() {
               disabled={loading}
               title="Sign in with your Google account via Supabase"
               style={{
-                height: "42px",
-                borderRadius: "12px",
+                height: "38px",
+                borderRadius: "10px",
                 border: "1.5px solid #e2e8f0",
                 background: "#ffffff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px",
+                gap: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 color: "#1e293b",
-                fontSize: "12px",
+                fontSize: "11px",
                 fontWeight: 600,
                 transition: "all 0.15s ease",
               }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24">
+              <svg width="15" height="15" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -821,21 +821,21 @@ export default function LoginPage() {
               onClick={handleAppleLogin}
               disabled={loading}
               style={{
-                height: "42px",
-                borderRadius: "12px",
+                height: "38px",
+                borderRadius: "10px",
                 border: "1.5px solid #e2e8f0",
                 background: "#ffffff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "8px",
+                gap: "6px",
                 cursor: loading ? "not-allowed" : "pointer",
                 color: "#1e293b",
-                fontSize: "12px",
+                fontSize: "11px",
                 fontWeight: 600,
               }}
             >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="#000000">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#000000">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.38c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.71-.93 2.73.99.08 2.01-.5 2.63-1.23" />
               </svg>
               <span>Continue with Apple</span>
@@ -843,14 +843,14 @@ export default function LoginPage() {
           </div>
 
           {/* Don't have an account? Sign Up */}
-          <div style={{ textAlign: "center", marginBottom: "14px" }}>
-            <span style={{ fontSize: "12.5px", color: "#64748B" }}>
+          <div style={{ textAlign: "center", marginBottom: "10px" }}>
+            <span style={{ fontSize: "11.5px", color: "#64748B" }}>
               Don't have an account?{" "}
             </span>
             <Link
               to="/auth/signup"
               style={{
-                fontSize: "12.5px",
+                fontSize: "11.5px",
                 fontWeight: 700,
                 color: "#2563eb",
                 textDecoration: "none",
@@ -870,17 +870,17 @@ export default function LoginPage() {
               justifyContent: "space-between",
               background: "#f0f9ff",
               border: "1px solid #bae6fd",
-              borderRadius: "14px",
-              padding: "12px 16px",
+              borderRadius: "12px",
+              padding: "9px 12px",
               transition: "all 0.15s ease",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
               <div
                 style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "10px",
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "8px",
                   background: "#e0f2fe",
                   display: "flex",
                   alignItems: "center",
@@ -889,23 +889,23 @@ export default function LoginPage() {
                   flexShrink: 0,
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4.5 3v5a4.5 4.5 0 0 0 9 0V3" />
                   <path d="M9 12.5V17a3 3 0 0 0 3 3h2a3 3 0 0 0 3-3v-1.5" />
                   <circle cx="18" cy="14" r="2" />
                 </svg>
               </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: "12.5px", fontWeight: 700, color: "#0f172a", lineHeight: 1.2 }}>
+                <h4 style={{ margin: 0, fontSize: "11.5px", fontWeight: 700, color: "#0f172a", lineHeight: 1.2 }}>
                   Are you a doctor?
                 </h4>
-                <p style={{ margin: 0, fontSize: "11px", color: "#64748B", lineHeight: 1.2 }}>
+                <p style={{ margin: 0, fontSize: "10px", color: "#64748B", lineHeight: 1.2 }}>
                   Login to your doctor portal
                 </p>
               </div>
             </div>
 
-            <span style={{ fontSize: "15px", color: "#0284c7", fontWeight: 700 }}>
+            <span style={{ fontSize: "14px", color: "#0284c7", fontWeight: 700 }}>
               →
             </span>
           </Link>

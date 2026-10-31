@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { DoctorRoute, PatientRoute } from "./components/ProtectedRoute";
+import { DoctorRoute } from "./components/ProtectedRoute";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const AIDraftPage = lazy(() => import("./pages/AIDraftPage"));
@@ -16,6 +16,7 @@ const SignupPage = lazy(() => import("./pages/SignupPage"));
 const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage"));
 const DoctorLoginPage = lazy(() => import("./pages/DoctorLoginPage"));
 const DoctorRegisterPage = lazy(() => import("./pages/DoctorRegisterPage"));
+const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 
 const RouteFallback = () => (
   <div style={{
@@ -47,100 +48,27 @@ export default function App() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        {/* ── Public / Home ─────────────────────────────────────────── */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/showcase" element={<ShowcasePage />} />
-        <Route path="/ugc" element={<UGCPage />} />
-        <Route path="/ugc/:id" element={<PostDetailPage />} />
-
-        {/* ── Auth (public) ──────────────────────────────────────────── */}
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/auth/signup" element={<SignupPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/patient" element={<PatientDashboardPage />} />
+        <Route path="/patient/dashboard" element={<PatientDashboardPage />} />
+        <Route path="/doctor" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
+        <Route path="/doctor/dashboard" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
         <Route path="/doctor/login" element={<DoctorLoginPage />} />
         <Route path="/doctor/register" element={<DoctorRegisterPage />} />
-
-        {/* ── Doctor-only (role-guarded) ─────────────────────────────── */}
-        <Route
-          path="/doctor"
-          element={
-            <DoctorRoute>
-              <DoctorDashboardPage />
-            </DoctorRoute>
-          }
-        />
-        <Route
-          path="/doctor/dashboard"
-          element={
-            <DoctorRoute>
-              <DoctorDashboardPage />
-            </DoctorRoute>
-          }
-        />
-        <Route
-          path="/review"
-          element={
-            <DoctorRoute>
-              <ReviewPage />
-            </DoctorRoute>
-          }
-        />
-        {/* ── Patient AI Draft Intake Review ────────────────────────── */}
         <Route path="/ai-draft" element={<AIDraftPage />} />
-        <Route
-          path="/export"
-          element={
-            <DoctorRoute>
-              <ExportPage />
-            </DoctorRoute>
-          }
-        />
-        <Route
-          path="/professional"
-          element={
-            <DoctorRoute>
-              <DoctorDashboardPage />
-            </DoctorRoute>
-          }
-        />
-        <Route
-          path="/professinal"
-          element={
-            <DoctorRoute>
-              <DoctorDashboardPage />
-            </DoctorRoute>
-          }
-        />
-
-        {/* ── Patient-only (role-guarded) ────────────────────────────── */}
-        <Route
-          path="/patient"
-          element={
-            <PatientRoute>
-              <PatientDashboardPage />
-            </PatientRoute>
-          }
-        />
-        <Route
-          path="/patient/dashboard"
-          element={
-            <PatientRoute>
-              <PatientDashboardPage />
-            </PatientRoute>
-          }
-        />
-        <Route
-          path="/patient/:tab"
-          element={
-            <PatientRoute>
-              <PatientDashboardPage />
-            </PatientRoute>
-          }
-        />
-
-        {/* ── Fallback ───────────────────────────────────────────────── */}
+        <Route path="/messages" element={<MessagesPage />} />
+        <Route path="/review" element={<DoctorRoute><ReviewPage /></DoctorRoute>} />
+        <Route path="/export" element={<ExportPage />} />
+        <Route path="/ugc" element={<UGCPage />} />
+        <Route path="/ugc/:id" element={<PostDetailPage />} />
+        <Route path="/professional" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
+        <Route path="/professinal" element={<DoctorRoute><DoctorDashboardPage /></DoctorRoute>} />
+        <Route path="/showcase" element={<ShowcasePage />} />
+        <Route path="/auth/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/auth/signup" element={<SignupPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
