@@ -104,5 +104,18 @@
     "is_initial_complaint": true,
     "created_at": "2026-10-31T18:36:15.465Z",
     "read": false
+  },
+  {
+    "id": "msg-1793535060551-3nvf",
+    "consultation_id": "f6388fde-d454-493b-a383-d0e325021b7b",
+    "sender_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "sender_name": "Patient",
+    "sender_role": "patient",
+    "receiver_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "receiver_name": "Dr. Priya Sharma",
+    "text": "Mujhe 3 din se khansi hai, raat ko zyada hoti hai. Allergy ki medicine kabhi-kabhi leta hoon...",
+    "is_initial_complaint": true,
+    "created_at": "2026-11-01T12:11:00.551Z",
+    "read": false
   }
 ]

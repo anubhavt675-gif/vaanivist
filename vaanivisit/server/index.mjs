@@ -269,7 +269,7 @@ Return ONLY valid JSON. No markdown, no code blocks, no extra text.`;
           messages: [
             {
               role: "system",
-              content: "You are Vaani Vision's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails."
+              content: "You are Clario's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails."
             },
             {
               role: "user",
@@ -390,7 +390,7 @@ Return ONLY valid JSON. No markdown, no code blocks, no extra text.`;
         model: tryModel,
         contents: prompt,
         config: {
-          systemInstruction: "You are Vaani Vision's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails.",
+          systemInstruction: "You are Clario's Clinical Multilingual Intake Extractor. Return strict JSON matching schema with clinical safety guardrails.",
           responseMimeType: "application/json",
         },
       });
@@ -1514,7 +1514,7 @@ app.post("/api/consultations", async (req, res) => {
         name: "Dr. Priya Sharma",
         qualification: "MBBS, MD (Internal Medicine)",
         registration_no: "DMC/R/2026/8941",
-        hospital: "Vaani Vision Digital Healthcare",
+        hospital: "Clario Digital Healthcare",
       },
       prescription: null,
       created_at: new Date().toISOString(),
@@ -1820,7 +1820,7 @@ app.post("/api/consultations/:id/prescriptions", async (req, res) => {
       doctor_name = "Dr. Priya Sharma",
       doctor_qualification = "MBBS, MD (Internal Medicine)",
       registration_no = "DMC/R/2026/8941",
-      hospital_name = "Vision Digital Healthcare",
+      hospital_name = "Clario Digital Healthcare",
     } = req.body;
 
     const consultations = getConsultations();
@@ -2151,7 +2151,7 @@ app.get("/api/conversations", (req, res) => {
       doctor_id: "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
       doctor_name: "Dr. Priya Sharma",
       doctor_qualification: "MBBS, MD • Verified Medical Reviewer",
-      main_complaint: "Welcome to Vision Consultation",
+      main_complaint: "Welcome to Clario Consultation",
       status: "in_review",
       messages: [
         {
@@ -2173,7 +2173,7 @@ app.get("/api/conversations", (req, res) => {
       },
       updated_at: new Date().toISOString(),
       prescription: null,
-      source_text: "Welcome to Vision Consultation",
+      source_text: "Welcome to Clario Consultation",
     };
     convMap.set(defaultId, defaultConv);
   }
@@ -2231,7 +2231,7 @@ app.post("/api/consultations/:id/accept", async (req, res) => {
     name: doctor_name,
     qualification: "MBBS, MD (Internal Medicine)",
     registration_no: "DMC/R/2026/8941",
-    hospital: "Vaani Vision Digital Healthcare",
+    hospital: "Clario Digital Healthcare",
   };
   consultation.updated_at = new Date().toISOString();
   saveConsultations(consultations);
@@ -2391,5 +2391,5 @@ if (fs.existsSync(distPath)) {
 }
 
 app.listen(PORT, () => {
-  console.log(`VaaniVisit Backend API Server running on port ${PORT}`);
+  console.log(`Clario Backend API Server running on port ${PORT}`);
 });

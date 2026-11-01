@@ -1,5 +1,33 @@
 [
   {
+    "id": "f6388fde-d454-493b-a383-d0e325021b7b",
+    "intake_id": "f6388fde-d454-493b-a383-d0e325021b7b",
+    "draft_id": "9ef70fd1-ecfb-4ea1-8002-d17a94746beb",
+    "patient_id": "ae05e114-5671-45da-ad13-ba1e60de8b7e",
+    "patient_name": "Patient",
+    "patient_age": 28,
+    "patient_gender": "Male",
+    "assigned_doctor_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "assigned_doctor_name": "Dr. Priya Sharma",
+    "source_text": "Mujhe 3 din se khansi hai, raat ko zyada hoti hai. Allergy ki medicine kabhi-kabhi leta hoon...",
+    "source_language": "hinglish",
+    "main_complaint": "Khansi (cough)",
+    "duration": "3 din",
+    "severity": "moderate",
+    "is_urgent": false,
+    "urgent_reason": null,
+    "status": "in_review",
+    "submitted_at": "2026-11-01T12:11:00.533Z",
+    "created_at": "2026-11-01T12:11:00.533Z",
+    "structured_content": {
+      "main_complaint": "Khansi (cough)",
+      "duration": "3 din",
+      "symptom_pattern": "raat ko zyada",
+      "medicine_use": "Allergy ki medicine kabhi-kabhi leta hoon",
+      "known_allergies": null
+    }
+  },
+  {
     "id": "c1d53408-f56b-410d-aabf-bf50fa691844",
     "intake_id": "c1d53408-f56b-410d-aabf-bf50fa691844",
     "draft_id": "c5939a3a-a9e4-466f-923d-bbb3b8db4237",

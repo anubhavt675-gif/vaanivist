@@ -120,7 +120,7 @@ export default function BottomBrandStrip() {
                 fontFamily: "'Inter', sans-serif"
               }}
             >
-              Vision
+              Clario
             </span>
           </div>
         </div>

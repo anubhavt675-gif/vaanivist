@@ -112,7 +112,7 @@ export default function PrescriptionModal({
       doctor_name: "Dr. Priya Sharma",
       doctor_qualification: "MBBS, MD (Internal Medicine)",
       registration_no: "DMC/R/2026/8941",
-      hospital_name: "Vaani Vision Digital Healthcare",
+      hospital_name: "Clario Digital Healthcare",
     };
 
     try {
@@ -188,7 +188,7 @@ export default function PrescriptionModal({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "18px" }}>📋</span>
               <h2 style={{ fontSize: "16px", fontWeight: 700, margin: 0, letterSpacing: "-0.3px" }}>
-                Vaani Vision — Clinical Prescription Generator
+                Clario — Clinical Prescription Generator
               </h2>
             </div>
             <p style={{ fontSize: "11px", color: "#94a3b8", margin: "2px 0 0" }}>

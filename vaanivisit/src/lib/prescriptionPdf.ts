@@ -51,7 +51,7 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
-  doc.text("VISION", 16, 18);
+  doc.text("CLARIO", 16, 18);
 
   // Brand Tagline
   doc.setFont("helvetica", "normal");
@@ -88,7 +88,7 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
   // Right-side hospital details
   doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 23, 42);
-  doc.text(data.doctor?.hospital || "Vaani Vision Digital Healthcare", pageWidth - 16, 49, { align: "right" });
+  doc.text(data.doctor?.hospital || "Clario Digital Healthcare", pageWidth - 16, 49, { align: "right" });
   doc.setFont("helvetica", "normal");
   doc.setTextColor(71, 85, 105);
   doc.text(`Issued Date: ${data.issued_date}`, pageWidth - 16, 54, { align: "right" });
@@ -263,7 +263,7 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
     { align: "center" }
   );
   doc.text(
-    `Vaani Vision Verification ID: ${data.id} • Hash: ${data.verification_hash || "VERIFIED-OK"} • Patient: ${data.patient_name}`,
+    `Clario Verification ID: ${data.id} • Hash: ${data.verification_hash || "VERIFIED-OK"} • Patient: ${data.patient_name}`,
     pageWidth / 2,
     footerY + 3.5,
     { align: "center" }
@@ -274,7 +274,7 @@ export function generatePrescriptionPDF(data: PrescriptionData): jsPDF {
 
 export function downloadPrescriptionPDF(data: PrescriptionData) {
   const doc = generatePrescriptionPDF(data);
-  const filename = `Vision_Prescription_${data.patient_name.replace(/\s+/g, "_")}_${data.id}.pdf`;
+  const filename = `Clario_Prescription_${data.patient_name.replace(/\s+/g, "_")}_${data.id}.pdf`;
   doc.save(filename);
 }
 

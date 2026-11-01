@@ -47,7 +47,7 @@ export function generateDraftPDF(data: DraftExportData): jsPDF {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
   doc.setTextColor(255, 255, 255);
-  doc.text("VISION", 16, 16);
+  doc.text("CLARIO", 16, 16);
 
   // Subtitle
   doc.setFont("helvetica", "normal");
@@ -235,7 +235,7 @@ export function generateDraftPDF(data: DraftExportData): jsPDF {
 
   doc.setFont("helvetica", "bold");
   doc.text(
-    `Vaani Vision Certified Clinical Intake | Verification Hash: ${data.contentHash ? data.contentHash.substring(0, 16) : "VERIFIED_2026"}`,
+    `Clario Certified Clinical Intake | Verification Hash: ${data.contentHash ? data.contentHash.substring(0, 16) : "VERIFIED_2026"}`,
     pageWidth - 16,
     footerY + 6,
     { align: "right" }
@@ -247,7 +247,7 @@ export function generateDraftPDF(data: DraftExportData): jsPDF {
 export function downloadDraftPDF(data: DraftExportData) {
   const doc = generateDraftPDF(data);
   const cleanName = (data.patientName || "patient").toLowerCase().replace(/[^a-z0-9]/g, "_");
-  const filename = `vision_clinical_draft_${cleanName}_${Date.now()}.pdf`;
+  const filename = `clario_clinical_draft_${cleanName}_${Date.now()}.pdf`;
   doc.save(filename);
 }
 

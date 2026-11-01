@@ -111,7 +111,7 @@ export default function SignupPage() {
               <circle cx="25" cy="16" r="7" fill="#1687F5" />
             </svg>
             <h3 style={{ fontSize: "19px", fontWeight: 800, color: "#071D35", margin: "4px 0 1px", letterSpacing: "-0.3px" }}>
-              Vision
+              Clario
             </h3>
             <span style={{ fontSize: "10.5px", color: "#64748B", fontWeight: 500 }}>
               AI Health Platform
@@ -121,7 +121,7 @@ export default function SignupPage() {
             Create Patient Account
           </h2>
           <p style={{ fontSize: "12.5px", color: "#64748B", margin: 0 }}>
-            Start AI consultations and connect with verified doctors on Vision
+            Start AI consultations and connect with verified doctors on Clario
           </p>
         </div>
 

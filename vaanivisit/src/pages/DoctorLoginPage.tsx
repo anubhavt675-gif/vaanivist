@@ -356,7 +356,7 @@ export default function DoctorLoginPage() {
       >
         <img
           src="/doctor-login-left-2x.png"
-          alt="Vision - Make a bigger impact with AI-powered care"
+          alt="Clario - Make a bigger impact with AI-powered care"
           style={{
             width: "100%",
             height: "100%",
@@ -452,7 +452,7 @@ export default function DoctorLoginPage() {
                 letterSpacing: "-0.3px",
               }}
             >
-              Vision
+              Clario
             </h3>
             <span
               style={{
@@ -1122,7 +1122,7 @@ export default function DoctorLoginPage() {
                     required
                     value={recoveryEmail}
                     onChange={(e) => setRecoveryEmail(e.target.value)}
-                    placeholder="dr.priya@vision.demo"
+                    placeholder="dr.priya@clario.demo"
                     style={{
                       width: "100%",
                       height: "40px",

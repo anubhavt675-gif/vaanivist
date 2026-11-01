@@ -1,5 +1,15 @@
 [
   {
+    "id": "notif-1793535060544-02u1",
+    "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
+    "title": "New Patient Consultation Ready",
+    "message": "Patient submitted AI-analyzed symptoms: \"Khansi (cough)\"",
+    "type": "consultation",
+    "link": "/review?id=f6388fde-d454-493b-a383-d0e325021b7b",
+    "read": false,
+    "created_at": "2026-11-01T12:11:00.544Z"
+  },
+  {
     "id": "notif-1793471775463-f82x",
     "user_id": "c2e2338c-8bb5-4cb9-93c0-4d425c21492f",
     "title": "New Patient Consultation Ready",

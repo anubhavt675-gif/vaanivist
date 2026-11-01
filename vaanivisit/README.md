@@ -1,4 +1,4 @@
-# VaaniVisit — Evidence-Backed Multilingual Patient Intake AI
+# Clario — Evidence-Backed Multilingual Patient Intake AI
 
 Production web application built with **React 19**, **Vite**, **TypeScript**, **Tailwind CSS v4**, **React Router v7**, and **Supabase Realtime**.
 

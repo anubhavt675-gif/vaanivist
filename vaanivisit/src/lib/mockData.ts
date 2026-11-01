@@ -1,4 +1,4 @@
-// Mock data for VaaniVisit application
+// Mock data for Clario application
 
 export interface PatientRecord {
   id: string;

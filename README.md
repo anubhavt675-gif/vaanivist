@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🩺 Vaani Vision (वाणी विज़न)
+# 🩺 Clario
 ### AI-Powered Multilingual Patient–Doctor Teleconsultation & Clinical Intake System
 *Evidence-Backed Multilingual Healthcare • हर आवाज़ मायने रखती है (Every Voice Matters)*
 

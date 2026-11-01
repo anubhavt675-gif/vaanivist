@@ -236,7 +236,7 @@ export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
                   lineHeight: 1.15,
                   fontFamily: "'Inter', sans-serif"
                 }}>
-                  Vision
+                  Clario
                 </span>
                 <span style={{
                   display: "inline-block",

@@ -29,7 +29,7 @@ function RoleLoadingScreen() {
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-        {/* Vaani Vision logo mark */}
+        {/* Clario logo mark */}
         <svg width="44" height="44" viewBox="0 0 40 40" fill="none">
           <ellipse cx="14" cy="23" rx="8" ry="10" transform="rotate(-25 14 23)" fill="#00B8C8" />
           <circle cx="25" cy="16" r="7" fill="#1687F5" />

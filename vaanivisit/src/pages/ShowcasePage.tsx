@@ -280,7 +280,7 @@ export default function ShowcasePage() {
                 Multilingual Healthcare Intake & Evidence Verification
               </h1>
               <p style={{ fontSize: "14px", color: "#cbd5e1", margin: 0, maxWidth: "720px", lineHeight: 1.5 }}>
-                Explore how VaaniVisit converts freeform patient statements in Hindi, Hinglish, and English into structured clinical records with strict, zero-hallucination quote offset matching and approval gating.
+                Explore how Clario converts freeform patient statements in Hindi, Hinglish, and English into structured clinical records with strict, zero-hallucination quote offset matching and approval gating.
               </p>
             </div>
             <div style={{
