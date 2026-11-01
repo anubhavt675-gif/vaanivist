@@ -1,6 +1,7 @@
-// Vercel Serverless Function - Single Catch-All API Handler for Vision
+// Vercel Serverless Function - Single Catch-All API Handler for Clario
 import app from "../vaanivisit/server/index.mjs";
 
 export default function handler(req, res) {
   return app(req, res);
 }
+

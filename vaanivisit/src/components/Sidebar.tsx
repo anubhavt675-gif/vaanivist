@@ -84,7 +84,7 @@ export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
               id: defaultProfile.id,
               displayName: name,
               role,
-              email: defaultProfile.role === "reviewer" ? "dr.priya@vision.demo" : "rohan.kumar@vision.demo",
+              email: defaultProfile.role === "reviewer" ? "dr.priya@clario.demo" : "rohan.kumar@clario.demo",
               avatarUrl: defaultProfile.avatar_url || null,
               initials,
             });
@@ -236,7 +236,7 @@ export default function Sidebar({ onOpenChat }: { onOpenChat?: () => void }) {
                   lineHeight: 1.15,
                   fontFamily: "'Inter', sans-serif"
                 }}>
-                  Vision
+                  Clario
                 </span>
                 <span style={{
                   display: "inline-block",

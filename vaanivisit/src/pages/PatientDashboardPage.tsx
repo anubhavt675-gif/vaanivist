@@ -141,7 +141,7 @@ export default function PatientDashboardPage() {
                 Welcome, Rohan Kumar
               </h2>
               <p style={{ fontSize: "11px", color: "#64748b", margin: 0 }}>
-                Vision Patient Dashboard • ID: VV-PAT-0928
+                Clario Patient Dashboard • ID: CL-PAT-0928
               </p>
             </div>
           </div>

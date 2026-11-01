@@ -39,7 +39,7 @@ const RouteFallback = () => (
         borderRadius: "50%",
         animation: "spin 0.8s linear infinite"
       }} />
-      <span>Loading Vision...</span>
+      <span>Loading Clario...</span>
     </div>
   </div>
 );

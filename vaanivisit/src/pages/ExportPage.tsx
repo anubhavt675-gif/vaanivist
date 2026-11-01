@@ -187,7 +187,7 @@ export default function ExportPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `vaanivisit_${draft.id}_${Date.now()}.json`;
+        a.download = `clario_${draft.id}_${Date.now()}.json`;
         a.click();
         URL.revokeObjectURL(url);
       } else {
@@ -427,14 +427,14 @@ export default function ExportPage() {
                           </svg>
                         </div>
                         <span style={{ fontSize: "18px", fontWeight: 800, color: "#0f1535" }}>
-                          <span style={{ color: "#06b6d4" }}>Vaani</span>Visit
+                          <span style={{ color: "#06b6d4" }}>Clario</span>
                         </span>
                       </div>
                       <p style={{ fontSize: "11px", color: "#8896a8", margin: 0 }}>Health Language Portal</p>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#0f1535", margin: "0 0 4px" }}>Patient Intake Report</h2>
-                      <p style={{ fontSize: "11px", color: "#8896a8", margin: 0 }}>Generated on 28 Oct 2026 • VaaniVisit</p>
+                      <p style={{ fontSize: "11px", color: "#8896a8", margin: 0 }}>Generated on 28 Oct 2026 • Clario</p>
                     </div>
                   </div>
 
@@ -532,7 +532,7 @@ export default function ExportPage() {
                   </div>
 
                   <div style={{ marginTop: "16px", paddingTop: "10px", borderTop: "1px solid #e2eaf6", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <p style={{ fontSize: "10px", color: "#9ca3af", margin: 0 }}>VaaniVisit — Evidence-backed multilingual patient intake AI</p>
+                    <p style={{ fontSize: "10px", color: "#9ca3af", margin: 0 }}>Clario — Evidence-backed multilingual patient intake AI</p>
                     <p style={{ fontSize: "10px", color: "#9ca3af", margin: 0 }}>Report ID: {draft.id}-20261028</p>
                   </div>
                 </>

@@ -370,7 +370,7 @@ export default function LoginPage() {
       >
         <img
           src="/login-left-2x.png"
-          alt="Vision - Get expert medical advice, powered by AI"
+          alt="Clario - Get expert medical advice, powered by AI"
           style={{
             width: "100%",
             height: "100%",
@@ -467,7 +467,7 @@ export default function LoginPage() {
                 letterSpacing: "-0.3px",
               }}
             >
-              Vision
+              Clario
             </h3>
             <span
               style={{

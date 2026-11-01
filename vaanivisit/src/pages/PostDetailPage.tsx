@@ -523,7 +523,7 @@ function PostDetailContent() {
                 Better Health<br />for the Future
               </h4>
               <p style={{ fontSize: "11px", color: "#047857", margin: "0 0 12px" }}>
-                VaaniVisit Community
+                Clario Community
               </p>
 
               {/* Heart plant vector */}
@@ -542,8 +542,7 @@ function PostDetailContent() {
               </div>
 
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}>
-                <span style={{ fontSize: "12px", fontWeight: 800, color: "#0f1535" }}>Vaani</span>
-                <span style={{ fontSize: "12px", fontWeight: 800, color: "#059669" }}>Visit</span>
+                <span style={{ fontSize: "13px", fontWeight: 800, color: "#059669" }}>Clario</span>
               </div>
             </div>
           </div>
