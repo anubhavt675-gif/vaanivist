@@ -1,11 +1,11 @@
 -- Supabase Migration: Create missing tables for Vision app
 -- Run this in Supabase Dashboard > SQL Editor
 
--- 1. consultations table
+-- 1. consultations table (no FK constraints to avoid type mismatch issues)
 CREATE TABLE IF NOT EXISTS public.consultations (
   id TEXT PRIMARY KEY,
-  intake_id TEXT REFERENCES public.patient_intakes(id) ON DELETE SET NULL,
-  patient_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  intake_id UUID,
+  patient_id UUID,
   patient_name TEXT,
   assigned_doctor_id UUID,
   assigned_doctor_name TEXT,
@@ -30,15 +30,20 @@ CREATE TABLE IF NOT EXISTS public.consultations (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS
 ALTER TABLE public.consultations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all authenticated" ON public.consultations FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon read" ON public.consultations FOR SELECT TO anon USING (true);
+
+DO $$ BEGIN
+  CREATE POLICY "All authenticated" ON public.consultations FOR ALL TO authenticated USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Anon read" ON public.consultations FOR SELECT TO anon USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- 2. messages table
 CREATE TABLE IF NOT EXISTS public.messages (
   id TEXT PRIMARY KEY,
-  consultation_id TEXT REFERENCES public.consultations(id) ON DELETE CASCADE,
+  consultation_id TEXT,
   sender_id UUID,
   sender_name TEXT,
   sender_role TEXT DEFAULT 'patient',
@@ -52,13 +57,19 @@ CREATE TABLE IF NOT EXISTS public.messages (
 );
 
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all authenticated" ON public.messages FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon read" ON public.messages FOR SELECT TO anon USING (true);
+
+DO $$ BEGIN
+  CREATE POLICY "All authenticated" ON public.messages FOR ALL TO authenticated USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Anon read" ON public.messages FOR SELECT TO anon USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- 3. notifications table
 CREATE TABLE IF NOT EXISTS public.notifications (
   id TEXT PRIMARY KEY,
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_id UUID,
   title TEXT NOT NULL,
   message TEXT,
   type TEXT DEFAULT 'info',
@@ -68,13 +79,19 @@ CREATE TABLE IF NOT EXISTS public.notifications (
 );
 
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all authenticated" ON public.notifications FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon read" ON public.notifications FOR SELECT TO anon USING (true);
+
+DO $$ BEGIN
+  CREATE POLICY "All authenticated" ON public.notifications FOR ALL TO authenticated USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Anon read" ON public.notifications FOR SELECT TO anon USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- 4. prescriptions table
 CREATE TABLE IF NOT EXISTS public.prescriptions (
   id TEXT PRIMARY KEY,
-  consultation_id TEXT REFERENCES public.consultations(id) ON DELETE CASCADE,
+  consultation_id TEXT,
   medications JSONB DEFAULT '[]',
   instructions TEXT,
   diagnosis TEXT,
@@ -87,5 +104,11 @@ CREATE TABLE IF NOT EXISTS public.prescriptions (
 );
 
 ALTER TABLE public.prescriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all authenticated" ON public.prescriptions FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Allow anon read" ON public.prescriptions FOR SELECT TO anon USING (true);
+
+DO $$ BEGIN
+  CREATE POLICY "All authenticated" ON public.prescriptions FOR ALL TO authenticated USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+DO $$ BEGIN
+  CREATE POLICY "Anon read" ON public.prescriptions FOR SELECT TO anon USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

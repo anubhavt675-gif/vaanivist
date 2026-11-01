@@ -1,31 +1,12 @@
 {
   "rewrites": [
-    { "source": "/api/intakes", "destination": "/api/intakes/index" },
-    { "source": "/api/intakes/:id/generate-draft", "destination": "/api/intakes/[id]" },
-    { "source": "/api/intakes/:id", "destination": "/api/intakes/[id]" },
-    { "source": "/api/drafts/by-intake/:intakeId", "destination": "/api/drafts/by-intake/[intakeId]" },
-    { "source": "/api/drafts/:id/submit-to-doctor", "destination": "/api/drafts/[id]" },
-    { "source": "/api/drafts/:id/review", "destination": "/api/drafts/[id]" },
-    { "source": "/api/drafts/:id/export", "destination": "/api/drafts/[id]" },
-    { "source": "/api/drafts/:id", "destination": "/api/drafts/[id]" },
-    { "source": "/api/conversations", "destination": "/api/conversations/index" },
-    { "source": "/api/messages/mark-read", "destination": "/api/messages/index" },
-    { "source": "/api/messages", "destination": "/api/messages/index" },
-    { "source": "/api/consultations/:id/accept", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id/decline", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id/request-info", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id/prescriptions", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id/prescription", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id/notes", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations/:id", "destination": "/api/consultations/[id]" },
-    { "source": "/api/consultations", "destination": "/api/consultations/index" },
-    { "source": "/api/reviewer/queue", "destination": "/api/reviewer/queue" },
-    { "source": "/api/doctor/overview", "destination": "/api/doctor/overview" },
-    { "source": "/api/doctor/appointments", "destination": "/api/doctor/appointments" },
-    { "source": "/api/patient/activity", "destination": "/api/patient/activity" },
-    { "source": "/api/notifications/mark-read", "destination": "/api/notifications/index" },
-    { "source": "/api/notifications", "destination": "/api/notifications/index" },
-    { "source": "/api/prescriptions", "destination": "/api/prescriptions/index" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.mjs"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }

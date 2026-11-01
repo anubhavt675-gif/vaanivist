@@ -444,8 +444,14 @@ Return ONLY valid JSON. No markdown, no code blocks, no extra text.`;
 }
 
 // --- Data Stores ---
-const DATA_DIR = path.resolve(__dirname, "../data");
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+const DATA_DIR = process.env.VERCEL
+  ? path.join("/tmp", "vision_data")
+  : path.resolve(__dirname, "../data");
+try {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+} catch (e) {
+  console.warn("Notice: could not create DATA_DIR, using fallback");
+}
 const POSTS_FILE = path.join(DATA_DIR, "community_posts.json");
 const COMMENTS_FILE = path.join(DATA_DIR, "community_comments.json");
 const CONSULTATIONS_FILE = path.join(DATA_DIR, "consultations.json");
@@ -2381,15 +2387,19 @@ app.get("/api/patient/activity", (req, res) => {
   return res.json({ activities });
 });
 
-// Production SPA Fallback
+// Production SPA Fallback (only for standalone local production server)
 const distPath = path.resolve(__dirname, "../dist");
-if (fs.existsSync(distPath)) {
+if (fs.existsSync(distPath) && !process.env.VERCEL) {
   app.use(express.static(distPath));
   app.use((req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`VaaniVisit Backend API Server running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`VaaniVisit Backend API Server running on port ${PORT}`);
+  });
+}
+
+export default app;

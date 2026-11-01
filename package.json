@@ -8,5 +8,12 @@
     "build": "npm --prefix vaanivisit run build && node -e \"const fs=require('fs');fs.cpSync('vaanivisit/dist','dist',{recursive:true})\"",
     "start": "npm --prefix vaanivisit run start",
     "typecheck": "npm --prefix vaanivisit run typecheck"
+  },
+  "dependencies": {
+    "@google/genai": "^2.32.0",
+    "@supabase/supabase-js": "^2.118.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0"
   }
 }

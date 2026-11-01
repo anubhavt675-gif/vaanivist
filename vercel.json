@@ -1,7 +1,14 @@
 {
-  "buildCommand": "npm --prefix vaanivisit run build",
-  "outputDirectory": "vaanivisit/dist",
+  "buildCommand": "npm --prefix vaanivisit run build && node -e \"const fs=require('fs');fs.cpSync('vaanivisit/dist','dist',{recursive:true})\"",
+  "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.mjs"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
