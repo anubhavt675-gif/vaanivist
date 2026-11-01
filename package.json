@@ -5,9 +5,8 @@
   "scripts": {
     "server": "npm --prefix vaanivisit run server",
     "dev": "npm --prefix vaanivisit run dev",
-    "build": "npm --prefix vaanivisit run build",
+    "build": "npm --prefix vaanivisit run build && node -e \"const fs=require('fs');fs.cpSync('vaanivisit/dist','dist',{recursive:true})\"",
     "start": "npm --prefix vaanivisit run start",
     "typecheck": "npm --prefix vaanivisit run typecheck"
   }
 }
-
